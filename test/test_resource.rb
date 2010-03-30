@@ -40,6 +40,16 @@ class ResourceTest < Test::Unit::TestCase
     assert last_response.body.include? '"title":"testing"'
   end
 
+  def test_index_method_with_sort
+    @collection.save({:testing => true, :rating => 5, :title => 'testing'})
+    get '/testing?[/title]'
+    assert last_response.ok?
+    assert last_response.body.include? '"title":"testing"'
+    get '/testing?[?rating=5]'
+    assert last_response.ok?
+    assert last_response.body.include? '"title":"testing"'
+  end
+
   def test_updating_a_document
     @collection.save({:title => 'testing', :_id => 1})
     put '/testing/1', '{"title": "testing update"}'

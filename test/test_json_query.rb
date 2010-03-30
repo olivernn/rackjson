@@ -4,13 +4,19 @@ class QueryTest < Test::Unit::TestCase
   def test_ascending_sort
     json_query = "[/price]"
     query  = Rack::JSON::JSONQuery.new(json_query)
-    assert_equal({:sort => [:price, :asc]}, query.options)
+    assert_equal({:sort => [[:price, :asc]]}, query.options)
   end
 
   def test_descending_sort
     json_query = '[\price]'
     query  = Rack::JSON::JSONQuery.new(json_query)
-    assert_equal({:sort => [:price, :desc]}, query.options)
+    assert_equal({:sort => [[:price, :desc]]}, query.options)
+  end
+
+  def test_multiple_sort_fields
+    json_query = '[/price, \rating]'
+    query = Rack::JSON::JSONQuery.new(json_query)
+    assert_equal({:sort => [[:price, :asc], [:rating, :desc]]}, query.options)
   end
 
   def test_skips_and_limits

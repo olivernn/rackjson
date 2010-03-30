@@ -62,10 +62,12 @@ module Rack::JSON
     end
 
     def set_query_sort(condition)
-      if condition.match /^[\/|\\]\w*$/
-        @options[:sort] = [condition.sub(/[\/|\\]/, '').to_sym, (condition.match(/\//) ? :asc : :desc)]
+      condition.split(/,\s?/).each do |part|
+        if part.match /^[\/|\\]\w*$/
+          @options[:sort] ||= []
+          @options[:sort] << [part.sub(/[\/|\\]/, '').to_sym, (part.match(/\//) ? :asc : :desc)]
+        end
       end
     end
-
   end
 end
