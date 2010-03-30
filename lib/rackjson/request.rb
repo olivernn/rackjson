@@ -23,7 +23,7 @@ module Rack::JSON
       begin
         Mongo::ObjectID.from_string(id_string)
       rescue Mongo::InvalidObjectID
-        id_string
+        id_string.match(/^\d+$/) ? id_string.to_i : id_string
       end
     end
   end
