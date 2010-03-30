@@ -1,0 +1,5 @@
+require 'test_document'
+require 'test_json_document'
+require 'test_json_query'
+require 'test_mongo_document'
+require 'test_resource'

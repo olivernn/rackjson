@@ -1,5 +1,8 @@
 require 'rubygems'
 require 'test/unit'
+require 'rack'
+require 'rack/test'
+require 'timecop'
 
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
