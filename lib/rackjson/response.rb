@@ -5,7 +5,6 @@ module Rack::JSON
       @body = body
       @headers = options[:headers] || {}
       set_headers
-      to_a
     end
 
     def to_a
