@@ -39,5 +39,6 @@ module Rack::JSON
   autoload :MongoDocument, 'rackjson/mongo_document'
   autoload :Request, 'rackjson/request'
   autoload :Resource, 'rackjson/resource'
+  autoload :Response, 'rackjson/response'
 
 end
