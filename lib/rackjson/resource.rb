@@ -36,6 +36,13 @@ module Rack::JSON
       rows = []
       @collection.find(request.query.selector, request.query.options).each { |row| rows << Rack::JSON::Document.new(row).attributes }
       render JSON.generate(rows)
+    def options(request)
+      if request.collection_path?
+        headers = { "Allow" => "GET, POST" }
+      elsif request.member_path?
+        headers = { "Allow" => "GET, PUT, DELETE" }
+      end
+      render "", :headers => headers
     end
 
     def post(request)
