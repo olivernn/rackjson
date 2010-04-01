@@ -9,6 +9,14 @@ module Rack::JSON
       self.path_info.split('/')[1]
     end
 
+    def collection_path?
+      self.path_info.match /^\/\w+$/
+    end
+
+    def member_path?
+      self.path_info.match /^\/\w+\/\w+$/
+    end
+
     def json
       self.body.rewind
       self.body.read
