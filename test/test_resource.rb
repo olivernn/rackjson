@@ -30,6 +30,21 @@ class ResourceTest < Test::Unit::TestCase
     assert last_response.body.include? '"title":"testing"'
   end
 
+  def test_show_a_single_document
+    put '/testing/1', '{"title": "testing first"}'
+    put '/testing/2', '{"title": "testing second"}'
+    get '/testing/1'
+    assert last_response.ok?
+    assert last_response.body.include? '"title":"testing first"'
+    assert !(last_response.body.include? '"title":"testing second"')
+  end
+
+  def test_not_finding_a_specific_document
+    get '/testing/1'
+    assert last_response.status == 404
+    assert last_response.body.include? "document not found"
+  end
+
   def test_index_method_with_query_parameters
     @collection.save({:testing => true, :rating => 5, :title => 'testing'})
     get '/testing?[?title=testing]'

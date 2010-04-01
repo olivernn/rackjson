@@ -33,9 +33,16 @@ module Rack::JSON
     end
 
     def get(request)
+      request.query.selector.merge!({:_id => request.resource_id}) if request.member_path?
       rows = []
       @collection.find(request.query.selector, request.query.options).each { |row| rows << Rack::JSON::Document.new(row).attributes }
-      render JSON.generate(rows)
+      if rows.empty? && request.member_path?
+        render "document not found", :status => 404
+      else
+        render JSON.generate(rows)
+      end
+    end
+
     def options(request)
       if request.collection_path?
         headers = { "Allow" => "GET, POST" }
