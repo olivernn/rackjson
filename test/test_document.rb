@@ -42,14 +42,6 @@ class DocumentTest < Test::Unit::TestCase
     assert(id.to_s, document.attributes[:_id])
   end
 
-  def test_resource_content_length
-    @collection.insert({"test"=>"hello"})
-    rows = []
-    @collection.find.each { |r| rows << r }
-    document = Rack::JSON::Document.new(rows.first)
-    assert(document.to_json.length.to_s, document.content_length)
-  end
-
   def test_creating_from_row
     @collection.insert({"test"=>"hello"})
     rows = []

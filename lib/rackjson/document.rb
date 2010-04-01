@@ -9,16 +9,8 @@ module Rack::JSON
       end
     end
 
-    def add_id(id_object)
-      @document.add_id(id_object)
-    end
-
-    def attributes
-      @document.attributes
-    end
-
-    def content_length
-      to_json.length.to_s
+    def method_missing(name, *args)
+      @document.send(name, *args)
     end
 
     def to_json
