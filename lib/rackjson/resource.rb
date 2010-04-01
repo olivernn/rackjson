@@ -22,6 +22,10 @@ module Rack::JSON
       @collections.include? request.collection
     end
 
+    def connect(request)
+      render "", :status => 405
+    end
+
     def delete(request)
       if @collection.remove({:_id => request.resource_id})
         render "{'ok': true}"
@@ -53,6 +57,10 @@ module Rack::JSON
 
     def render(body, options={})
       Rack::JSON::Response.new(body, options).to_a
+    end
+
+    def trace(request)
+      render "", :status => 405
     end
   end
 end
