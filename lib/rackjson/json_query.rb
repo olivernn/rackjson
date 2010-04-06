@@ -5,7 +5,7 @@ module Rack::JSON
 
     def initialize(query_string)
       @query_string = query_string
-      @conditions = @query_string.split(/\[|\]/).compact.reject(&:empty?)
+      @conditions = @query_string.split(/\[|\]/).compact.reject {|q| q.empty? }
       @options = {}
       @selector = {}
       build
