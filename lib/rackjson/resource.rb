@@ -74,7 +74,7 @@ module Rack::JSON
     end
 
     METHODS_NOT_ALLOWED.each do |method|
-      define_method method do
+      define_method method do |request|
         render "", :status => 405
       end
     end
