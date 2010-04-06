@@ -3,8 +3,10 @@ module Rack::JSON
     def initialize(body, options={})
       @status = options[:status] || 200
       @body = body
+      @head = options[:head] || false
       @headers = options[:headers] || {}
       set_headers
+      head_response if @head
     end
 
     def to_a
@@ -12,6 +14,10 @@ module Rack::JSON
     end
 
     private
+
+    def head_response
+      @body = ""
+    end
 
     def set_headers
       @headers["Content-Length"] = @body.length.to_s
