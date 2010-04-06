@@ -1,5 +1,7 @@
 module Rack::JSON
   class Resource
+    METHODS_NOT_ALLOWED = [:trace, :connect]
+
     def initialize(app, options)
       @app = app
       @collections = options[:collections]
@@ -20,10 +22,6 @@ module Rack::JSON
 
     def bypass?(request)
       @collections.include? request.collection
-    end
-
-    def connect(request)
-      render "", :status => 405
     end
 
     def delete(request)
@@ -73,8 +71,10 @@ module Rack::JSON
       Rack::JSON::Response.new(body, options).to_a
     end
 
-    def trace(request)
-      render "", :status => 405
+    METHODS_NOT_ALLOWED.each do |method|
+      define_method method do
+        render "", :status => 405
+      end
     end
   end
 end
