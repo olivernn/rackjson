@@ -10,7 +10,7 @@ module Rack::JSON
     end
 
     def to_a
-      [@status, @headers, @body]
+      [@status, @headers, [@body]]
     end
 
     private
