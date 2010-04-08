@@ -21,7 +21,11 @@ module Rack::JSON
     private
 
     def bypass?(request)
-      @collections.include? request.collection
+      if request.collection
+        @collections.include? request.collection
+      else
+        true
+      end
     end
 
     def delete(request)
