@@ -6,7 +6,7 @@ module Rack::JSON
     end
 
     def collection
-      self.path_info.split('/')[1]
+      self.path_info.split('/')[1] || ""
     end
 
     def collection_path?
