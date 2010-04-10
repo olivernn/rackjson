@@ -17,15 +17,7 @@ module Rack::JSON
 
     def set_created_at
       if @attributes["_id"].class == Mongo::ObjectID
-        @attributes["created_at"] = "Date(#{@attributes["_id"].generation_time.to_i * 1000})"
-      end
-    end
-
-    def set_attribute_dates
-      @attributes.each_pair do |key, value|
-        if value.is_a? Time
-          @attributes[key] = "Date(#{@attributes[key].to_i * 1000})"
-        end
+        @attributes["created_at"] = @attributes["_id"].generation_time
       end
     end
 

@@ -20,16 +20,11 @@ class Hash
   end
 end
 
-class Time
-  def to_json
-    "Date(#{to_i * 1000})"
-  end
-end
-
 require 'rubygems'
 require 'json'
 require 'rack'
 require 'mongo'
+require 'time'
 
 module Rack::JSON
 

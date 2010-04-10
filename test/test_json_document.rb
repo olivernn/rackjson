@@ -16,9 +16,9 @@ class JSONDocumentTest < Test::Unit::TestCase
   end
   
   def test_parsing_dates_from_json
-    hash = { "date" => "Date(1269293632000)" }
+    hash = { "date" => "2010-04-10T14:20:12Z" }
     doc = JSON.generate hash
-    assert_equal( Time.at(1269293632000) , Rack::JSON::JSONDocument.new(doc).attributes["date"])
+    assert_equal( Time.parse("2010-04-10T14:20:12Z") , Rack::JSON::JSONDocument.new(doc).attributes["date"])
   end
   
   def test_parsing_mongo_object_id

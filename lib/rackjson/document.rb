@@ -17,9 +17,6 @@ module Rack::JSON
       unless @json
         gen_attrs = @document.attributes
         gen_attrs.each_pair do |key, value|
-          if value.is_a? Time
-            gen_attrs[key] = "Date(#{value.to_i * 1000})"
-          end
 
           if value.is_a? Mongo::ObjectID
             gen_attrs[key] = gen_attrs[key].to_s
