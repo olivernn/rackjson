@@ -27,8 +27,12 @@ module Rack::JSON
     end
 
     def delete(request)
-      if @collection.remove({:_id => request.resource_id})
-        render "{'ok': true}"
+      if request.member_path?
+        if @collection.remove({:_id => request.resource_id})
+          render "{'ok': true}"
+        end
+      else
+        render "", :status => 405
       end
     end
 

@@ -81,6 +81,11 @@ class ResourceTest < Test::Unit::TestCase
     assert @collection.find_one({:_id => 1}).nil?
   end
 
+  def test_deleting_only_with_member_path
+    delete '/testing'
+    assert last_response.status == 405
+  end
+
   def test_posting_a_document
     post '/testing', '{"title": "testing"}'
     assert last_response.status == 201
