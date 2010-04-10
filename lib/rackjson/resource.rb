@@ -1,5 +1,7 @@
 module Rack::JSON
   class Resource
+    METHODS_NOT_ALLOWED = [:trace, :connect]
+
     def initialize(app, options)
       @app = app
       @collections = options[:collections]
@@ -22,10 +24,6 @@ module Rack::JSON
       @collections.include? request.collection
     end
 
-    def connect(request)
-      render "", :status => 405
-    end
-
     def delete(request)
       if request.member_path?
         if @collection.remove({:_id => request.resource_id})
@@ -36,14 +34,16 @@ module Rack::JSON
       end
     end
 
-    def get(request)
-      request.query.selector.merge!({:_id => request.resource_id}) if request.member_path?
-      rows = []
-      @collection.find(request.query.selector, request.query.options).each { |row| rows << Rack::JSON::Document.new(row).attributes }
-      if rows.empty? && request.member_path?
-        render "document not found", :status => 404
-      else
-        render JSON.generate(rows)
+    [:get, :head].each do |method|
+      define_method method do |request|
+        request.query.selector.merge!({:_id => request.resource_id}) if request.member_path?
+        rows = []
+        @collection.find(request.query.selector, request.query.options).each { |row| rows << Rack::JSON::Document.new(row).attributes }
+        if rows.empty? && request.member_path?
+          render "document not found", :status => 404, :head => (method == :head)
+        else
+          render JSON.generate(rows), :head => (method == :head)
+        end
       end
     end
 
@@ -77,8 +77,10 @@ module Rack::JSON
       Rack::JSON::Response.new(body, options).to_a
     end
 
-    def trace(request)
-      render "", :status => 405
+    METHODS_NOT_ALLOWED.each do |method|
+      define_method method do
+        render "", :status => 405
+      end
     end
   end
 end

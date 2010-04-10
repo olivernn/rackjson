@@ -35,4 +35,11 @@ class ResponseTest < Test::Unit::TestCase
     response = Rack::JSON::Response.new("{'title': 'hello'}")
     assert_equal("{'title': 'hello'}", response.to_a[2])
   end
+
+  def test_head_response
+    response = Rack::JSON::Response.new("test", :head => true)
+    assert_equal("", response.to_a[2])
+    assert_equal("4", response.to_a[1]["Content-Length"])
+    assert_equal("text/plain", response.to_a[1]["Content-Type"])
+  end
 end
