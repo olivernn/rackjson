@@ -14,24 +14,27 @@ class DocumentTest < Test::Unit::TestCase
   def test_creating_from_json
     json = '{"test":"hello"}'
     document = Rack::JSON::Document.new(json)
-    assert({:test => "hello", :created_at => Time.now, :updated_at => Time.now}, document.attributes)
+    assert_equal("hello", document.attributes["test"])
+    assert_equal(Time.now.to_s, document.attributes["created_at"].to_s)
+    assert_equal(Time.now.to_s, document.attributes["updated_at"].to_s)
   end
 
   def test_creating_from_json_with_id
     json = '{"_id": "4b9f783ba040140525000001", "test":"hello"}'
     document = Rack::JSON::Document.new(json)
-    assert({
-        :_id => Mongo::ObjectID.from_string('4b9f783ba040140525000001'), 
-        :test => "hello", 
-        :created_at => Time.now, 
-        :updated_at => Time.now
-      }, document.attributes)
+    assert_equal(Mongo::ObjectID.from_string('4b9f783ba040140525000001'), document.attributes["_id"])
+    assert_equal("hello", document.attributes["test"])
+    assert_equal(Time.now.to_s, document.attributes["created_at"].to_s)
+    assert_equal(Time.now.to_s, document.attributes["updated_at"].to_s)
   end
 
   def test_creating_from_json_with_non_object_id
     json = '{"_id": 1, "test":"hello"}'
     document = Rack::JSON::Document.new(json)
-    assert({:_id => 1, :test => "hello", :created_at => Time.now, :updated_at => Time.now}, document.attributes)
+    assert_equal(1, document.attributes["_id"])
+    assert_equal("hello", document.attributes["test"])
+    assert_equal(Time.now.to_s, document.attributes["created_at"].to_s)
+    assert_equal(Time.now.to_s, document.attributes["updated_at"].to_s)
   end
 
   def test_adding_id
@@ -39,7 +42,7 @@ class DocumentTest < Test::Unit::TestCase
     document = Rack::JSON::Document.new(json)
     id = @collection.insert(document.attributes)
     document.add_id(id)
-    assert(id.to_s, document.attributes[:_id])
+    assert_equal(id.to_s, document.attributes[:_id].to_s)
   end
 
   def test_creating_from_row
@@ -47,12 +50,14 @@ class DocumentTest < Test::Unit::TestCase
     rows = []
     @collection.find.each { |r| rows << r }
     document = Rack::JSON::Document.new(rows.first)
-    assert({:test => "hello"}, document.attributes)
+    assert_equal("hello", document.attributes["test"])
   end
 
   def test_document_created_at
     json = '{"test":"hello", "created_at": "01/01/2010"}'
     document = Rack::JSON::Document.new(json)
-    assert({:test => "hello", :created_at => "01/01/2010", :updated_at => Time.now }, document.attributes)
+    assert_equal("hello", document.attributes["test"])
+    assert_equal("01/01/2010", document.attributes["created_at"])
+    assert_equal(Time.now.to_s, document.attributes["updated_at"].to_s)
   end
 end
