@@ -13,7 +13,14 @@ class ResourceTest < Test::Unit::TestCase
   end
 
   def app
-    Rack::JSON::Resource.new Object.new,  :collections => [:testing], :db => @db 
+    Rack::JSON::Resource.new lambda { |env| 
+      [404, {'Content-Length' => '9', 'Content-Type' => 'text/plain'}, "Not Found"]
+    },  :collections => [:testing], :db => @db 
+  end
+
+  def test_non_existing_resource
+    get '/blah'
+    assert_equal 404, last_response.status
   end
 
   def test_index_method
