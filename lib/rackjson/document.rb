@@ -4,7 +4,7 @@ module Rack::JSON
     def initialize(doc)
       if doc.is_a? String
         @document = Rack::JSON::JSONDocument.new(doc)
-      else # TODO, check for the right kind of mongo doc
+      else doc.is_a? OrderedHash
         @document = Rack::JSON::MongoDocument.new(doc)
       end
     end
