@@ -25,7 +25,7 @@ class ResourceTest < Test::Unit::TestCase
 
   def test_creating_a_document
     put '/testing/1', '{"title": "testing"}'
-    assert last_response.ok?
+    assert_equal 201, last_response.status
     assert_match /"_id":1/, last_response.body
     assert_match /"title":"testing"/, last_response.body
   end
@@ -63,6 +63,13 @@ class ResourceTest < Test::Unit::TestCase
     get '/testing?[?rating=5]'
     assert last_response.ok?
     assert_match /"title":"testing"/, last_response.body
+  end
+
+  def test_putting_a_new_document
+    put '/testing/1', '{"title": "testing update"}'
+    assert_equal 201, last_response.status
+    assert_match /"_id":1/, last_response.body
+    assert_match /"title":"testing update"/, last_response.body
   end
 
   def test_updating_a_document
