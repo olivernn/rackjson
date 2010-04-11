@@ -12,12 +12,12 @@ module Rack::JSON
     private
 
     def set_attribute_ids
-      @attributes["_id"] = @attributes["_id"].to_s if (@attributes["_id"].class == Mongo::ObjectID)
+      @attributes["_id"] = @attributes["_id"].to_s if (@attributes["_id"].is_a? Mongo::ObjectID)
     end
 
     def set_created_at
-      if @attributes["_id"].class == Mongo::ObjectID
-        @attributes["created_at"] = @attributes["_id"].generation_time
+      if @attributes["_id"].is_a? Mongo::ObjectID
+        @attributes["created_at"] = @attributes["_id"].generation_time unless @attributes["created_at"]
       end
     end
 
