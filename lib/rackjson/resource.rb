@@ -21,16 +21,16 @@ module Rack::JSON
     private
 
     def bypass?(request)
-      if request.collection
-        @collections.include? request.collection
-      else
-        true
-      end
+      !(@collections.include? request.collection.to_sym)
     end
 
     def delete(request)
-      if @collection.remove({:_id => request.resource_id})
-        render "{'ok': true}"
+      if request.member_path?
+        if @collection.remove({:_id => request.resource_id})
+          render "{'ok': true}"
+        end
+      else
+        render "", :status => 405
       end
     end
 
@@ -65,10 +65,11 @@ module Rack::JSON
     end
 
     def put(request)
+      @collection.find_one(:_id => request.resource_id) ? status = 200 : status = 201
       document = Rack::JSON::Document.new(request.json)
       document.add_id(request.resource_id)
       @collection.save(document.attributes)
-      render document.to_json
+      render document.to_json, :status => status
     rescue JSON::ParserError => error
       render (error.class.to_s + " :" + error.message), :status => 422
     end

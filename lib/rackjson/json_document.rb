@@ -20,8 +20,8 @@ module Rack::JSON
 
     def set_attribute_dates
       @attributes.each_pair do |key, value|
-        if value.class == String && value.match(/^Date\(\d*\)$/)
-          @attributes[key] = Time.at(value.gsub(/\D/, '').to_i)
+        if value.class == String && value.match(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/)
+          @attributes[key] = Time.parse(value)
         end
       end
     end

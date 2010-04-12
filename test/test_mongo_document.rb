@@ -18,7 +18,7 @@ class MongoDocumentTest < Test::Unit::TestCase
     hash = { "_id" => Mongo::ObjectID.from_string("4ba7e82ca04014011c000001") }
     doc = Rack::JSON::MongoDocument.new(hash).attributes
     assert_equal({ "_id" => "4ba7e82ca04014011c000001", 
-                   "created_at" => "Date(#{Mongo::ObjectID.from_string("4ba7e82ca04014011c000001").generation_time.to_i * 1000})"
+                   "created_at" => Mongo::ObjectID.from_string("4ba7e82ca04014011c000001").generation_time
                  }, doc)
   end
 end

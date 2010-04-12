@@ -4,7 +4,7 @@ module Rack::JSON
     def initialize(doc)
       if doc.is_a? String
         @document = Rack::JSON::JSONDocument.new(doc)
-      else # TODO, check for the right kind of mongo doc
+      else doc.is_a? OrderedHash
         @document = Rack::JSON::MongoDocument.new(doc)
       end
     end
@@ -17,9 +17,6 @@ module Rack::JSON
       unless @json
         gen_attrs = @document.attributes
         gen_attrs.each_pair do |key, value|
-          if value.is_a? Time
-            gen_attrs[key] = "Date(#{value.to_i * 1000})"
-          end
 
           if value.is_a? Mongo::ObjectID
             gen_attrs[key] = gen_attrs[key].to_s
