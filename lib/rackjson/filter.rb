@@ -12,7 +12,7 @@ module Rack::JSON
       if bypass? request
         @app.call(env)
       else
-        send(request.request_method.downcase, request)
+        apply_filters(request)
       end
     end
 
@@ -22,11 +22,10 @@ module Rack::JSON
       !(@collections.include? request.collection.to_sym)
     end
 
-    def get(request)
+    def apply_filters(request)
       @filters.each do |filter|
         request.add_query_param("[?#{filter}=#{request.session[filter.to_s]}]") if request.session[filter.to_s]
       end
-      # request.add_query_param("[?user_id=#{request.session['user_id']}]") if request.session['user_id']
       @app.call(request)
     end
   end

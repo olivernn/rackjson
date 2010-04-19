@@ -36,4 +36,22 @@ class FilterTest < Test::Unit::TestCase
     get '/testing?[?title=awesome]'
     assert_equal '[?title=awesome]', URI.decode(last_request.query_string)
   end
+
+  def test_setting_query_params_on_post
+    get '/login'
+    post '/testing'
+    assert_equal "[?user_id=1]", last_request.query_string
+  end
+
+  def test_setting_query_params_on_put
+    get '/login'
+    put '/testing'
+    assert_equal "[?user_id=1]", last_request.query_string
+  end
+
+  def test_setting_query_params_on_delete
+    get '/login'
+    delete '/testing'
+    assert_equal "[?user_id=1]", last_request.query_string
+  end
 end
