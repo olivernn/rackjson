@@ -1,7 +1,6 @@
 require 'helper'
-require 'uri'
 
-class ResourceTest < Test::Unit::TestCase
+class FilterTest < Test::Unit::TestCase
   include Rack::Test::Methods
   include Rack::Utils
 
