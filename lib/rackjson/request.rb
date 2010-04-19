@@ -2,7 +2,12 @@ module Rack::JSON
   class Request < Rack::Request
     include Rack::Utils
     def initialize(env)
+      @env = env
       super(env)
+    end
+
+    def add_query_param(param)
+      self.query_string << param
     end
 
     def collection
@@ -33,6 +38,10 @@ module Rack::JSON
       rescue Mongo::InvalidObjectID
         id_string.match(/^\d+$/) ? id_string.to_i : id_string
       end
+    end
+
+    def session
+      @env['rack.session']
     end
   end
 end
