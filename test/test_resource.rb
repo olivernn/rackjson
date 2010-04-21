@@ -18,8 +18,13 @@ class ResourceTest < Test::Unit::TestCase
     },  :collections => [:testing], :db => @db 
   end
 
-  def test_non_existing_resource
+  def test_get_non_existing_resource
     get '/blah'
+    assert_equal 404, last_response.status
+  end
+
+  def test_post_non_existing_resource
+    post '/blah', '{ "title": "hello!" }'
     assert_equal 404, last_response.status
   end
 
