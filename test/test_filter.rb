@@ -7,9 +7,10 @@ class FilterTest < Test::Unit::TestCase
   def app
     Rack::Session::Cookie.new(
       Rack::JSON::Filter.new lambda { |env|
+        request = Rack::JSON::Request.new(env)
         env['rack.session'] = {}
         env['rack.session']['user_id'] = 1
-        [200, {'Content-Length' => '2', 'Content-Type' => 'text/plain'}, "OK"]
+        [200, {'Content-Length' => request.json.length, 'Content-Type' => 'text/plain'}, request.json]
       },  :collections => [:testing], :filters => [:user_id]
     )
   end
@@ -33,13 +34,13 @@ class FilterTest < Test::Unit::TestCase
 
   def test_setting_query_params_on_post
     get '/login'
-    post '/testing'
+    post '/testing', '{ "title": "hello!" }'
     assert_equal "[?user_id=1]", last_request.query_string
   end
 
   def test_setting_query_params_on_put
     get '/login'
-    put '/testing'
+    put '/testing/1', '{ "title": "hello!" }'
     assert_equal "[?user_id=1]", last_request.query_string
   end
 
@@ -47,5 +48,11 @@ class FilterTest < Test::Unit::TestCase
     get '/login'
     delete '/testing'
     assert_equal "[?user_id=1]", last_request.query_string
+  end
+
+  def test_appending_query_param_to_document
+    get '/login'
+    post '/testing', '{ "title": "hello!" }'
+    assert_match /"user_id":1/, last_response.body
   end
 end
