@@ -9,6 +9,10 @@ module Rack::JSON
       end
     end
 
+    def add_attributes(pair)
+      @document.attributes.merge!(pair)
+    end
+
     def method_missing(name, *args)
       @document.send(name, *args)
     end

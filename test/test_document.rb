@@ -11,6 +11,13 @@ class DocumentTest < Test::Unit::TestCase
     @collection.drop
   end
 
+  def test_adding_attributes_to_the_document
+    json = '{"test":"hello"}'
+    document = Rack::JSON::Document.new(json)
+    document.add_attributes("user_id" => 1)
+    assert_equal(1, document.attributes["user_id"])
+  end
+
   def test_creating_from_json
     json = '{"test":"hello"}'
     document = Rack::JSON::Document.new(json)
