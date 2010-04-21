@@ -1,6 +1,9 @@
 module Rack::JSON
   class Request < Rack::Request
     include Rack::Utils
+
+    attr_reader :env
+
     def initialize(env)
       @env = env
       super(env)
@@ -42,6 +45,11 @@ module Rack::JSON
 
     def session
       @env['rack.session']
+    end
+
+    def set_body json
+      @env['rack.input'] = StringIO.new(json)
+      @env['rack.input'].rewind
     end
   end
 end
