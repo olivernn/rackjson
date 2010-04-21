@@ -26,15 +26,9 @@ class FilterTest < Test::Unit::TestCase
     assert_equal '[?title=awesome][?user_id=1]', URI.decode(last_request.query_string)
   end
 
-  def test_not_setting_query_string_if_no_session_var
+  def test_reject_request_if_no_session_var
     get '/testing'
-    puts last_request.query_string
-    assert_equal "", last_request.query_string
-  end
-
-  def test_not_overriding_existing_query_parameters_if_no_session_var
-    get '/testing?[?title=awesome]'
-    assert_equal '[?title=awesome]', URI.decode(last_request.query_string)
+    assert_equal 412, last_response.status
   end
 
   def test_setting_query_params_on_post
