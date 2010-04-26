@@ -28,6 +28,11 @@ class ResourceTest < Test::Unit::TestCase
     assert_equal 404, last_response.status
   end
 
+  def test_get_root
+    get '/'
+    assert_equal 404, last_response.status
+  end
+
   def test_index_method
     @collection.save({:testing => true})
     get '/testing'
