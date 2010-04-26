@@ -22,6 +22,7 @@ class CollectionTest < Test::Unit::TestCase
     mongo_results = []
     @mongo_collection.find(:testing => true).each { |row| mongo_results << row }
     assert_equal @collection.find(:testing => true).first.attributes, mongo_results.first
+    assert_kind_of Rack::JSON::Document, @collection.find(:testing => true).first
   end
 
   def test_finding_documents_using_multiple_search_conditions
