@@ -28,6 +28,7 @@ require 'time'
 
 module Rack::JSON
 
+  autoload :Collection, 'rackjson/collection'
   autoload :Filter, 'rackjson/filter'
   autoload :Document, 'rackjson/document'
   autoload :JSONDocument, 'rackjson/json_document'
