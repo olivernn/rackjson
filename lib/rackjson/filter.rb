@@ -34,7 +34,7 @@ module Rack::JSON
     end
 
     def bypass?(request)
-      !(@collections.include? request.collection.to_sym)
+      request.collection.empty? || !(@collections.include? request.collection.to_sym)
     end
 
     def pre_condition_not_met_for filter
