@@ -13,21 +13,23 @@ class CollectionTest < Test::Unit::TestCase
 
   def test_finding_a_single_document_by_id
     mongo_document = @mongo_collection.save({:testing => true, :rating => 5, :title => 'testing', :_id => 1})
-    assert_equal @collection.find(1), @mongo_collection.find_one(:_id => 1)
+    assert_equal @collection.find(1).attributes, @mongo_collection.find_one(:_id => 1)
+    assert_kind_of Rack::JSON::Document, @collection.find(1)
   end
 
   def test_finding_documents_using_search_conditions
     mongo_document = @mongo_collection.save({:testing => true, :rating => 5, :title => 'testing', :_id => 1})
     mongo_results = []
     @mongo_collection.find(:testing => true).each { |row| mongo_results << row }
-    assert_equal @collection.find(:testing => true), mongo_results
+    assert_equal @collection.find(:testing => true).first.attributes, mongo_results.first
   end
 
   def test_finding_documents_using_multiple_search_conditions
     mongo_document = @mongo_collection.save({:testing => true, :rating => 5, :title => 'testing', :_id => 1})
     mongo_results = []
     @mongo_collection.find(:testing => true, :rating => 5).each { |row| mongo_results << row }
-    assert_equal @collection.find(:testing => true, :rating => 5), mongo_results
+    assert_equal @collection.find(:testing => true, :rating => 5).length, mongo_results.length
+    assert_equal @collection.find(:testing => true, :rating => 5).first.attributes, mongo_results.first
   end
 
   def test_finding_no_documents_using_search_conditions
@@ -40,8 +42,8 @@ class CollectionTest < Test::Unit::TestCase
     second_mongo_document = @mongo_collection.save({:testing => true, :rating => 10, :title => 'testing', :_id => 2})
     third_mongo_document = @mongo_collection.save({:testing => false, :rating => 10, :title => 'testing', :_id => 3})
     assert_equal @collection.find({:testing => true}, {:sort => [:rating, :desc]}).length, 2
-    assert_equal @collection.find({:testing => true}, {:sort => [:rating, :desc]}).first["rating"], 10
-    assert_equal @collection.find({:testing => true}, {:sort => [:rating, :desc]}).first["testing"], true
+    assert_equal @collection.find({:testing => true}, {:sort => [:rating, :desc]}).first.attributes["rating"], 10
+    assert_equal @collection.find({:testing => true}, {:sort => [:rating, :desc]}).first.attributes["testing"], true
   end
 
   def test_finding_all_documents_with_options
@@ -85,7 +87,7 @@ class CollectionTest < Test::Unit::TestCase
     assert_equal @collection.all.length, 0
     assert @collection.create({:_id => 1, :title => 'testing'})
     assert_equal @collection.all.length, 1
-    assert_equal @collection.find(1)["title"], "testing"
+    assert_equal @collection.find(1).attributes["title"], "testing"
   end
 
   def test_updating_an_existing_document_by_id
@@ -93,7 +95,7 @@ class CollectionTest < Test::Unit::TestCase
     assert_equal @collection.all.length, 1
     assert @collection.exists?(1)
     assert @collection.update(1, {:testing => false})
-    assert_equal @collection.find(1)["testing"], false
+    assert_equal @collection.find(1).attributes["testing"], false
   end
 
   def test_updating_an_existing_document_but_selector_fails
@@ -101,6 +103,6 @@ class CollectionTest < Test::Unit::TestCase
     assert_equal @collection.all.length, 1
     assert @collection.exists?(1)
     assert !@collection.update(1, {:testing => false}, {:rating => 6})
-    assert_equal @collection.find(1)["testing"], true
+    assert_equal @collection.find(1).attributes["testing"], true
   end
 end

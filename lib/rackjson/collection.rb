@@ -26,9 +26,9 @@ module Rack::JSON
 
     def find(selector, options={})
       if selector.is_a? Hash
-        @collection.find(selector, options).to_a
+        @collection.find(selector, options).inject([]) {|documents, row| documents << Rack::JSON::Document.new(row)}
       else
-        @collection.find_one(:_id => selector)
+        Rack::JSON::Document.new(@collection.find_one(:_id => selector))
       end
     end
 
