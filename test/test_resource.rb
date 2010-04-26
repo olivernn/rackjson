@@ -14,7 +14,7 @@ class ResourceTest < Test::Unit::TestCase
 
   def app
     Rack::JSON::Resource.new lambda { |env| 
-      [404, {'Content-Length' => '9', 'Content-Type' => 'text/plain'}, "Not Found"]
+      [404, {'Content-Length' => '9', 'Content-Type' => 'text/plain'}, ["Not Found"]]
     },  :collections => [:testing], :db => @db 
   end
 

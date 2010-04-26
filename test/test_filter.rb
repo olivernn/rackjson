@@ -10,7 +10,7 @@ class FilterTest < Test::Unit::TestCase
         request = Rack::JSON::Request.new(env)
         env['rack.session'] = {}
         env['rack.session']['user_id'] = 1
-        [200, {'Content-Length' => request.json.length, 'Content-Type' => 'text/plain'}, request.json]
+        [200, {'Content-Length' => request.json.length.to_s, 'Content-Type' => 'text/plain'}, [request.json]]
       },  :collections => [:testing], :filters => [:user_id]
     )
   end
