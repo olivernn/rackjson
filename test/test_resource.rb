@@ -49,7 +49,7 @@ class ResourceTest < Test::Unit::TestCase
 
   def test_show_a_single_document
     put '/testing/1', '{"title": "testing first"}'
-    put '/testing/2', '{"title": "testing second"}'
+    post '/testing', '{"title": "testing second"}'
     get '/testing/1'
     assert last_response.ok?
     assert_match /"title":"testing first"/, last_response.body
@@ -95,6 +95,22 @@ class ResourceTest < Test::Unit::TestCase
     assert last_response.ok?
     assert_match /"_id":1/, last_response.body
     assert_match /"title":"testing update"/, last_response.body
+  end
+
+  def test_updating_a_document_with_matching_query_params
+    @collection.save({:title => 'testing', :_id => 1, :user_id => 1})
+    put '/testing/1?[?user_id=1]', '{"title": "testing update"}'
+    assert last_response.ok?
+    assert_match /"_id":1/, last_response.body
+    assert_match /"title":"testing update"/, last_response.body
+  end
+
+  def test_updating_a_document_with_non_matching_query_params
+    @collection.save({:title => 'testing', :_id => 1, :user_id => 2})
+    put '/testing/1?[?user_id=1]', '{"title": "testing update"}'
+    assert_equal 404, last_response.status
+    assert_equal @collection.find_one(:_id => 1)["title"], 'testing'
+    assert_nil @collection.find_one(:_id => 1, :user_id => 1)
   end
 
   def test_deleting_a_document

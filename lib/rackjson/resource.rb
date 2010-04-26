@@ -13,7 +13,7 @@ module Rack::JSON
       if bypass? request
         @app.call(env)
       else
-        @collection = @db[request.collection]
+        @collection = Rack::JSON::Collection.new(@db[request.collection])
         send(request.request_method.downcase, request)
       end
     end
@@ -26,7 +26,7 @@ module Rack::JSON
 
     def delete(request)
       if request.member_path?
-        if @collection.remove({:_id => request.resource_id})
+        if @collection.delete({:_id => request.resource_id})
           render "{'ok': true}"
         end
       else
@@ -37,12 +37,11 @@ module Rack::JSON
     [:get, :head].each do |method|
       define_method method do |request|
         request.query.selector.merge!({:_id => request.resource_id}) if request.member_path?
-        rows = []
-        @collection.find(request.query.selector, request.query.options).each { |row| rows << Rack::JSON::Document.new(row).attributes }
-        if rows.empty? && request.member_path?
+        documents = @collection.find(request.query.selector, request.query.options)
+        if documents.empty? && request.member_path?
           render "document not found", :status => 404, :head => (method == :head)
         else
-          render JSON.generate(rows), :head => (method == :head)
+          render JSON.generate(documents), :head => (method == :head)
         end
       end
     end
@@ -58,24 +57,37 @@ module Rack::JSON
 
     def post(request)
       document = Rack::JSON::Document.new(request.json)
-      @collection.insert(document.attributes)
+      @collection.create(document.attributes)
       render document.to_json, :status => 201
     rescue JSON::ParserError => error
       render (error.class.to_s + " :" + error.message), :status => 422
     end
 
     def put(request)
-      @collection.find_one(:_id => request.resource_id) ? status = 200 : status = 201
-      document = Rack::JSON::Document.new(request.json)
-      document.add_id(request.resource_id)
-      @collection.save(document.attributes)
-      render document.to_json, :status => status
+      @collection.exists?(request.resource_id) ? update(request) : upsert(request)
     rescue JSON::ParserError => error
       render (error.class.to_s + " :" + error.message), :status => 422
     end
 
     def render(body, options={})
       Rack::JSON::Response.new(body, options).to_a
+    end
+
+    def update(request)
+      document = Rack::JSON::Document.new(request.json)
+      document.add_id(request.resource_id)
+      if @collection.update(request.resource_id, document.attributes, request.query.selector)
+        render document.to_json, :status => 200
+      else
+        render "document not found", :status => 404
+      end
+    end
+
+    def upsert(request)
+      document = Rack::JSON::Document.new(request.json)
+      document.add_id(request.resource_id)
+      @collection.save(document.attributes)
+      render document.to_json, :status => 201
     end
 
     METHODS_NOT_ALLOWED.each do |method|
