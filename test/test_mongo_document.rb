@@ -3,7 +3,7 @@ require 'helper'
 class MongoDocumentTest < Test::Unit::TestCase
 
   def test_stringifying_mongo_object_ids
-    hash = { "_id" => Mongo::ObjectID.from_string("4ba7e82ca04014011c000001") }
+    hash = { "_id" => BSON::ObjectID.from_string("4ba7e82ca04014011c000001") }
     doc = Rack::JSON::MongoDocument.new(hash).attributes
     assert_equal("4ba7e82ca04014011c000001", doc["_id"])
   end
@@ -15,10 +15,10 @@ class MongoDocumentTest < Test::Unit::TestCase
   end
 
   def test_setting_the_created_at_stamp
-    hash = { "_id" => Mongo::ObjectID.from_string("4ba7e82ca04014011c000001") }
+    hash = { "_id" => BSON::ObjectID.from_string("4ba7e82ca04014011c000001") }
     doc = Rack::JSON::MongoDocument.new(hash).attributes
     assert_equal({ "_id" => "4ba7e82ca04014011c000001", 
-                   "created_at" => Mongo::ObjectID.from_string("4ba7e82ca04014011c000001").generation_time
+                   "created_at" => BSON::ObjectID.from_string("4ba7e82ca04014011c000001").generation_time
                  }, doc)
   end
 end

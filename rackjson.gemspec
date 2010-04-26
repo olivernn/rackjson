@@ -9,22 +9,24 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Oliver Nightingale"]
-  s.date = %q{2010-04-10}
+  s.date = %q{2010-04-26}
   s.description = %q{A rack end point for storing json documents.}
   s.email = %q{oliver.n@new-bamboo.co.uk}
   s.extra_rdoc_files = [
     "LICENSE",
-     "README.rdoc"
+     "README.markdown"
   ]
   s.files = [
     ".document",
      ".gitignore",
      "LICENSE",
-     "README.rdoc",
+     "README.markdown",
      "Rakefile",
      "VERSION",
      "lib/rackjson.rb",
+     "lib/rackjson/collection.rb",
      "lib/rackjson/document.rb",
+     "lib/rackjson/filter.rb",
      "lib/rackjson/json_document.rb",
      "lib/rackjson/json_query.rb",
      "lib/rackjson/mongo_document.rb",
@@ -34,7 +36,9 @@ Gem::Specification.new do |s|
      "rackjson.gemspec",
      "test/helper.rb",
      "test/suite.rb",
+     "test/test_collection.rb",
      "test/test_document.rb",
+     "test/test_filter.rb",
      "test/test_json_document.rb",
      "test/test_json_query.rb",
      "test/test_mongo_document.rb",
@@ -49,7 +53,9 @@ Gem::Specification.new do |s|
   s.test_files = [
     "test/helper.rb",
      "test/suite.rb",
+     "test/test_collection.rb",
      "test/test_document.rb",
+     "test/test_filter.rb",
      "test/test_json_document.rb",
      "test/test_json_query.rb",
      "test/test_mongo_document.rb",
@@ -62,9 +68,21 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
+      s.add_runtime_dependency(%q<mongo>, [">= 0.20.1"])
+      s.add_runtime_dependency(%q<bson_ext>, [">= 0.20.1"])
+      s.add_runtime_dependency(%q<json>, [">= 1.2.3"])
+      s.add_runtime_dependency(%q<rack>, [">= 1.0.1"])
     else
+      s.add_dependency(%q<mongo>, [">= 0.20.1"])
+      s.add_dependency(%q<bson_ext>, [">= 0.20.1"])
+      s.add_dependency(%q<json>, [">= 1.2.3"])
+      s.add_dependency(%q<rack>, [">= 1.0.1"])
     end
   else
+    s.add_dependency(%q<mongo>, [">= 0.20.1"])
+    s.add_dependency(%q<bson_ext>, [">= 0.20.1"])
+    s.add_dependency(%q<json>, [">= 1.2.3"])
+    s.add_dependency(%q<rack>, [">= 1.0.1"])
   end
 end
 

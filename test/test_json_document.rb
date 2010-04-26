@@ -24,7 +24,7 @@ class JSONDocumentTest < Test::Unit::TestCase
   def test_parsing_mongo_object_id
     hash = { "_id" => "4ba7e82ca04014011c000001" }
     doc = JSON.generate hash
-    assert_equal(Mongo::ObjectID.from_string("4ba7e82ca04014011c000001"), Rack::JSON::JSONDocument.new(doc).attributes["_id"])
+    assert_equal(BSON::ObjectID.from_string("4ba7e82ca04014011c000001"), Rack::JSON::JSONDocument.new(doc).attributes["_id"])
   end
   
   def test_parsing_non_mongo_object_ids
