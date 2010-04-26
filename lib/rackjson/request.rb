@@ -37,8 +37,8 @@ module Rack::JSON
     def resource_id
       id_string = self.path_info.split('/').last.to_s
       begin
-        Mongo::ObjectID.from_string(id_string)
-      rescue Mongo::InvalidObjectID
+        BSON::ObjectID.from_string(id_string)
+      rescue BSON::InvalidObjectID
         id_string.match(/^\d+$/) ? id_string.to_i : id_string
       end
     end

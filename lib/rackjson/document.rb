@@ -21,7 +21,7 @@ module Rack::JSON
       unless @json
         gen_attrs = @document.attributes
         gen_attrs.each_pair do |key, value|
-          if value.is_a? Mongo::ObjectID
+          if value.is_a? BSON::ObjectID
             gen_attrs[key] = gen_attrs[key].to_s
           end
         end
