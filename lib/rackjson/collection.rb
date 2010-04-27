@@ -47,11 +47,7 @@ module Rack::JSON
     private
 
     def prepared selector
-      if selector.is_a? Hash
-        selector
-      else
-        {:_id => selector}
-      end
+      selector.is_a?(Hash) ? selector : {:_id => selector}
     end
 
   end
