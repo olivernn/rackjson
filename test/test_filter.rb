@@ -15,42 +15,42 @@ class FilterTest < Test::Unit::TestCase
     )
   end
 
-  def test_adding_user_id_query_parameter
+  test "adding a user id query parameter" do
     get '/login'
     get '/testing'
     assert_equal "[?user_id=1]", last_request.query_string
   end
 
-  def test_not_overriding_existing_query_parameters
+  test "dont override any existing query parameters" do
     get '/login'
     get '/testing?[?title=awesome]'
     assert_equal '[?title=awesome][?user_id=1]', URI.decode(last_request.query_string)
   end
 
-  def test_reject_request_if_no_session_var
+  test "reject request if no session var" do
     get '/testing'
     assert_equal 412, last_response.status
   end
 
-  def test_setting_query_params_on_post
+  test "setting query parameters on a post request" do
     get '/login'
     post '/testing', '{ "title": "hello!" }'
     assert_equal "[?user_id=1]", last_request.query_string
   end
 
-  def test_setting_query_params_on_put
+  test "setting query params on put requests" do
     get '/login'
     put '/testing/1', '{ "title": "hello!" }'
     assert_equal "[?user_id=1]", last_request.query_string
   end
 
-  def test_setting_query_params_on_delete
+  test "setting query params on delete requests" do
     get '/login'
     delete '/testing'
     assert_equal "[?user_id=1]", last_request.query_string
   end
 
-  def test_appending_query_param_to_document
+  test "appending query params to a document" do
     get '/login'
     post '/testing', '{ "title": "hello!" }'
     assert_match /"user_id":1/, last_response.body
