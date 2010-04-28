@@ -6,11 +6,12 @@ module Rack::JSON
       @app = app
       @collections = options[:collections]
       @filters = options[:filters]
+      @methods = options[:methods]
     end
 
     def call(env)
       request = Rack::JSON::Request.new(env)
-      if bypass? request
+      if bypass?(request) || !@methods.include?(request.request_method.downcase.to_sym)
         @app.call(env)
       else
         apply_filters(request)

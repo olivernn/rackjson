@@ -11,7 +11,7 @@ class FilterTest < Test::Unit::TestCase
         env['rack.session'] = {}
         env['rack.session']['user_id'] = 1
         [200, {'Content-Length' => request.json.length.to_s, 'Content-Type' => 'text/plain'}, [request.json]]
-      },  :collections => [:testing], :filters => [:user_id]
+      },  :collections => [:testing], :filters => [:user_id], :methods => @test_methods || [:get, :post, :put, :delete]
     )
   end
 
@@ -48,6 +48,20 @@ class FilterTest < Test::Unit::TestCase
     get '/login'
     delete '/testing'
     assert_equal "[?user_id=1]", last_request.query_string
+  end
+
+  test "setting query params on get requests" do
+    @test_methods = [:get]
+    get '/login'
+    get '/testing'
+    assert_equal "[?user_id=1]", last_request.query_string
+  end
+
+  test "not adding methods when the request method is not filterable" do
+    @test_methods = [:post]
+    get '/login'
+    get '/testing'
+    assert_not_equal "[?user_id=1]", last_request.query_string
   end
 
   test "appending query params to a document" do
