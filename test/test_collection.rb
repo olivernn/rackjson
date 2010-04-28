@@ -11,7 +11,7 @@ class CollectionTest < Test::Unit::TestCase
     @collection.delete_all
   end
 
-  def test_finding_a_single_document_by_id
+  test "finding a single document by id" do
     mongo_document = @mongo_collection.save({:testing => true, :rating => 5, :title => 'testing', :_id => 1})
     assert_equal @collection.find(1).attributes, @mongo_collection.find_one(:_id => 1)
     assert_kind_of Rack::JSON::Document, @collection.find(1)
