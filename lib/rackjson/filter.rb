@@ -1,5 +1,6 @@
 module Rack::JSON
   class Filter
+    include Rack::JSON::EndPoint
 
     def initialize(app, options)
       @app = app
@@ -26,19 +27,15 @@ module Rack::JSON
 
     def apply_filters(request)
       @filters.each do |filter|
-        return pre_condition_not_met unless request.session[filter.to_s]
+        return pre_condition_not_met unless request.session.keys.include? filter.to_s
         request.add_query_param "[?#{filter}=#{request.session[filter.to_s]}]"
       end
       append_filters_to_document_in request if request.post? || request.put?
       @app.call(request.env)
     end
 
-    def bypass?(request)
-      request.collection.empty? || !(@collections.include? request.collection.to_sym)
-    end
-
     def pre_condition_not_met
-      Rack::JSON::Response.new("pre condition not met", :status => 412, :head => true).to_a
+      render "pre condition not met", :status => 412, :head => true
     end
   end
 end

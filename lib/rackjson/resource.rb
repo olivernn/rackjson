@@ -1,5 +1,6 @@
 module Rack::JSON
   class Resource
+    include Rack::JSON::EndPoint
     METHODS_NOT_ALLOWED = [:trace, :connect]
 
     def initialize(app, options)
@@ -19,10 +20,6 @@ module Rack::JSON
     end
 
     private
-
-    def bypass?(request)
-      request.collection.empty? || !(@collections.include? request.collection.to_sym)
-    end
 
     def delete(request)
       if request.member_path?
@@ -67,10 +64,6 @@ module Rack::JSON
       @collection.exists?(request.resource_id) ? update(request) : upsert(request)
     rescue JSON::ParserError => error
       render (error.class.to_s + " :" + error.message), :status => 422
-    end
-
-    def render(body, options={})
-      Rack::JSON::Response.new(body, options).to_a
     end
 
     def update(request)

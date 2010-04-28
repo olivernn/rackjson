@@ -6,6 +6,7 @@ require 'time'
 
 module Rack::JSON
 
+  autoload :EndPoint, 'rackjson/end_point'
   autoload :Collection, 'rackjson/collection'
   autoload :Filter, 'rackjson/filter'
   autoload :Document, 'rackjson/document'
