@@ -11,7 +11,7 @@ module Rack::JSON
 
     def call(env)
       request = Rack::JSON::Request.new(env)
-      if bypass?(request) || !@methods.include?(request.request_method.downcase.to_sym)
+      if bypass_path?(request) || bypass_method?(request)
         @app.call(env)
       else
         apply_filters(request)

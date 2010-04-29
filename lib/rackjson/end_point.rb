@@ -1,7 +1,18 @@
 module Rack::JSON
   module EndPoint
+
+    private
+
     def bypass? request
       request.collection.empty? || !(@collections.include? request.collection.to_sym)
+    end
+
+    def bypass_path? request
+      bypass? request
+    end
+
+    def bypass_method? request
+      !@methods.include?(request.request_method.downcase.to_sym)
     end
 
     def render body, options={}
