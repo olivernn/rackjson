@@ -44,7 +44,7 @@ module Rack::JSON
     end
 
     def session
-      @env['rack.session']
+      @env['rack.session'] || {}
     end
 
     def set_body json

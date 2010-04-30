@@ -3,9 +3,11 @@ require 'json'
 require 'rack'
 require 'mongo'
 require 'time'
+require 'rackjson/rack/builder'
 
 module Rack::JSON
 
+  autoload :Builder, 'rackjson/rack/builder'
   autoload :EndPoint, 'rackjson/end_point'
   autoload :Collection, 'rackjson/collection'
   autoload :Filter, 'rackjson/filter'
