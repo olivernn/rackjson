@@ -69,4 +69,10 @@ class FilterTest < Test::Unit::TestCase
     post '/testing', '{ "title": "hello!" }'
     assert_match /"user_id":1/, last_response.body
   end
+
+  test "handling invalid json" do
+    get '/login'
+    post '/testing', 'invalid json'
+    assert_equal 422, last_response.status
+  end
 end

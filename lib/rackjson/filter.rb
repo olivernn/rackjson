@@ -33,6 +33,8 @@ module Rack::JSON
       end
       append_filters_to_document_in request if request.post? || request.put?
       @app.call(request.env)
+    rescue JSON::ParserError => error
+      return invalid_json error
     end
 
     def pre_condition_not_met
