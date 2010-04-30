@@ -15,6 +15,10 @@ module Rack::JSON
       !@methods.include?(request.request_method.downcase.to_sym)
     end
 
+    def invalid_json error
+      render (error.class.to_s + " :" + error.message), :status => 422
+    end
+
     def render body, options={}
       Rack::JSON::Response.new(body, options).to_a
     end

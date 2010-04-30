@@ -57,13 +57,13 @@ module Rack::JSON
       @collection.create(document.attributes)
       render document.to_json, :status => 201
     rescue JSON::ParserError => error
-      render (error.class.to_s + " :" + error.message), :status => 422
+      invalid_json error
     end
 
     def put(request)
       @collection.exists?(request.resource_id) ? update(request) : upsert(request)
     rescue JSON::ParserError => error
-      render (error.class.to_s + " :" + error.message), :status => 422
+      invalid_json error
     end
 
     def update(request)
