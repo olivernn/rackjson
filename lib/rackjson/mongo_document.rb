@@ -1,11 +1,11 @@
 module Rack::JSON
   class MongoDocument
+    include Rack::JSON::BaseDocument
 
     attr_accessor :attributes
 
     def initialize(row)
       @attributes = row
-      set_created_at
       set_attributes
     end
 
@@ -13,20 +13,6 @@ module Rack::JSON
 
     def set_attribute_ids
       @attributes["_id"] = @attributes["_id"].to_s if (@attributes["_id"].is_a? BSON::ObjectID)
-    end
-
-    def set_created_at
-      if @attributes["_id"].is_a? BSON::ObjectID
-        @attributes["created_at"] = @attributes["_id"].generation_time unless @attributes["created_at"]
-      end
-    end
-
-    def set_attributes
-      private_methods.each do |method|
-        if method.match /^set_attribute_\w*$/
-          send method
-        end
-      end
     end
   end
 end

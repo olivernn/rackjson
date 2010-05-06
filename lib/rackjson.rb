@@ -7,6 +7,7 @@ require 'rackjson/rack/builder'
 
 module Rack::JSON
 
+  autoload :BaseDocument, 'rackjson/base_document'
   autoload :Builder, 'rackjson/rack/builder'
   autoload :EndPoint, 'rackjson/end_point'
   autoload :Collection, 'rackjson/collection'

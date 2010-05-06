@@ -13,7 +13,9 @@ class CollectionTest < Test::Unit::TestCase
 
   test "finding a single document by id" do
     mongo_document = @mongo_collection.save({:testing => true, :rating => 5, :title => 'testing', :_id => 1})
-    assert_equal @collection.find(1).attributes, @mongo_collection.find_one(:_id => 1)
+    assert_equal @collection.find(1).attributes['testing'], @mongo_collection.find_one(:_id => 1)['testing']
+    assert_equal @collection.find(1).attributes['rating'], @mongo_collection.find_one(:_id => 1)['rating']
+    assert_equal @collection.find(1).attributes['title'], @mongo_collection.find_one(:_id => 1)['title']
     assert_kind_of Rack::JSON::Document, @collection.find(1)
   end
 
@@ -21,7 +23,7 @@ class CollectionTest < Test::Unit::TestCase
     mongo_document = @mongo_collection.save({:testing => true, :rating => 5, :title => 'testing', :_id => 1})
     mongo_results = []
     @mongo_collection.find(:testing => true).each { |row| mongo_results << row }
-    assert_equal @collection.find(:testing => true).first.attributes, mongo_results.first
+    assert_equal @collection.find(:testing => true, :rating => 5).first.attributes['testing'], mongo_results.first['testing']
     assert_kind_of Rack::JSON::Document, @collection.find(:testing => true).first
   end
 
@@ -30,7 +32,7 @@ class CollectionTest < Test::Unit::TestCase
     mongo_results = []
     @mongo_collection.find(:testing => true, :rating => 5).each { |row| mongo_results << row }
     assert_equal @collection.find(:testing => true, :rating => 5).length, mongo_results.length
-    assert_equal @collection.find(:testing => true, :rating => 5).first.attributes, mongo_results.first
+    assert_equal @collection.find(:testing => true, :rating => 5).first.attributes['testing'], mongo_results.first['testing']
   end
 
   def test_finding_no_documents_using_search_conditions
