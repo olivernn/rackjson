@@ -44,6 +44,21 @@ class DocumentTest < Test::Unit::TestCase
     assert_equal(Time.now.to_s, document.attributes["updated_at"].to_s)
   end
 
+  test "creating from json with single nested document" do
+    json = '{"test":"hello", "nested":{"foo":"bar"}}'
+    document = Rack::JSON::Document.new(json)
+    assert document.attributes['nested'].is_a?(Hash)
+    assert_equal 'bar', document.attributes['nested']['foo']
+  end
+
+  test "creating from json with multiple nested documents" do
+    json = '{"test":"hello", "nested":[{"foo":"bar"}, {"boo":"far"}]}'
+    document = Rack::JSON::Document.new(json)
+    assert document.attributes['nested'].is_a?(Array)
+    assert_equal({'foo' => 'bar'}, document.attributes['nested'][0])
+    assert_equal 'far', document.attributes['nested'][1]['boo']
+  end
+
   def test_adding_id
     json = '{"test":"hello"}'
     document = Rack::JSON::Document.new(json)
