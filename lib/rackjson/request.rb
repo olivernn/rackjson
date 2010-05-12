@@ -18,11 +18,11 @@ module Rack::JSON
     end
 
     def collection_path?
-      self.path_info.match /^\/\w+$/
+      self.path_info.match /^\/[\w-]+$/
     end
 
     def member_path?
-      self.path_info.match /^\/\w+\/\w+$/
+      self.path_info.match /^\/\w+\/[\w-]+$/
     end
 
     def json

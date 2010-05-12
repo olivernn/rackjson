@@ -18,36 +18,36 @@ class ResourceTest < Test::Unit::TestCase
     },  :collections => [:testing], :db => @db 
   end
 
-  def test_get_non_existing_resource
+  test "test get non existing resource" do
     get '/blah'
     assert_equal 404, last_response.status
   end
 
-  def test_post_non_existing_resource
+  test "test post non existing resource" do
     post '/blah', '{ "title": "hello!" }'
     assert_equal 404, last_response.status
   end
 
-  def test_get_root
+  test "test get root" do
     get '/'
     assert_equal 404, last_response.status
   end
 
-  def test_index_method
+  test "test index method" do
     @collection.save({:testing => true})
     get '/testing'
     assert last_response.ok?
     assert_match /"testing":true/, last_response.body
   end
 
-  def test_creating_a_document
+  test "test creating a document" do
     put '/testing/1', '{"title": "testing"}'
     assert_equal 201, last_response.status
     assert_match /"_id":1/, last_response.body
     assert_match /"title":"testing"/, last_response.body
   end
 
-  def test_show_a_single_document
+  test "test show a single document" do
     put '/testing/1', '{"title": "testing first"}'
     post '/testing', '{"title": "testing second"}'
     get '/testing/1'
@@ -56,13 +56,13 @@ class ResourceTest < Test::Unit::TestCase
     assert_no_match /"title":"testing second"/, last_response.body
   end
 
-  def test_not_finding_a_specific_document
+  test "test not finding a specific document" do
     get '/testing/1'
     assert_equal 404, last_response.status
     assert_equal "document not found", last_response.body
   end
 
-  def test_index_method_with_query_parameters
+  test "test index method with query parameters" do
     @collection.save({:testing => true, :rating => 5, :title => 'testing'})
     get '/testing?[?title=testing]'
     assert last_response.ok?
@@ -72,7 +72,7 @@ class ResourceTest < Test::Unit::TestCase
     assert_match /"title":"testing"/, last_response.body
   end
 
-  def test_index_method_with_sort
+  test "test index method with sort" do
     @collection.save({:testing => true, :rating => 5, :title => 'testing'})
     get '/testing?[/title]'
     assert last_response.ok?
@@ -82,14 +82,14 @@ class ResourceTest < Test::Unit::TestCase
     assert_match /"title":"testing"/, last_response.body
   end
 
-  def test_putting_a_new_document
+  test "test putting a new document" do
     put '/testing/1', '{"title": "testing update"}'
     assert_equal 201, last_response.status
     assert_match /"_id":1/, last_response.body
     assert_match /"title":"testing update"/, last_response.body
   end
 
-  def test_updating_a_document
+  test "test updating a document" do
     @collection.save({:title => 'testing', :_id => 1})
     put '/testing/1', '{"title": "testing update"}'
     assert last_response.ok?
@@ -97,7 +97,7 @@ class ResourceTest < Test::Unit::TestCase
     assert_match /"title":"testing update"/, last_response.body
   end
 
-  def test_updating_a_document_with_matching_query_params
+  test "test updating a document with matching query params" do
     @collection.save({:title => 'testing', :_id => 1, :user_id => 1})
     put '/testing/1?[?user_id=1]', '{"title": "testing update"}'
     assert last_response.ok?
@@ -105,7 +105,7 @@ class ResourceTest < Test::Unit::TestCase
     assert_match /"title":"testing update"/, last_response.body
   end
 
-  def test_updating_a_document_with_non_matching_query_params
+  test "test updating a document with non matching query params" do
     @collection.save({:title => 'testing', :_id => 1, :user_id => 2})
     put '/testing/1?[?user_id=1]', '{"title": "testing update"}'
     assert_equal 404, last_response.status
@@ -113,7 +113,7 @@ class ResourceTest < Test::Unit::TestCase
     assert_nil @collection.find_one(:_id => 1, :user_id => 1)
   end
 
-  def test_deleting_a_document
+  test "test deleting a document" do
     @collection.save({:title => 'testing', :_id => 1})
     assert @collection.find_one({:_id => 1})
     delete '/testing/1'
@@ -121,14 +121,24 @@ class ResourceTest < Test::Unit::TestCase
     assert_nil @collection.find_one({:_id => 1})
   end
 
-  def test_deleting_only_with_member_path
+  test "test deleting only with member path" do
     delete '/testing'
     assert_equal 405, last_response.status
   end
 
-  def test_posting_a_document
+  test "test posting a document" do
     post '/testing', '{"title": "testing"}'
     assert last_response.status == 201
+    assert_match /"title":"testing"/, last_response.body
+  end
+
+  test "using a string id for a document" do
+    put '/testing/string-id-1', '{"title": "testing"}'
+    put '/testing/another-string-id-2', '{"foo": "bar"}'
+    assert last_response.status == 201
+    get '/testing/string-id-1'
+    assert_equal 'testing', @collection.find_one({:_id => 'string-id-1'})['title']
+    assert_no_match /"foo":"bar"/, last_response.body
     assert_match /"title":"testing"/, last_response.body
   end
 end
