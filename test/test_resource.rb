@@ -54,6 +54,7 @@ class ResourceTest < Test::Unit::TestCase
     assert last_response.ok?
     assert_match /"title":"testing first"/, last_response.body
     assert_no_match /"title":"testing second"/, last_response.body
+    assert_instance_of Hash, JSON.parse(last_response.body)
   end
 
   test "test not finding a specific document" do

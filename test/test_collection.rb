@@ -13,10 +13,8 @@ class CollectionTest < Test::Unit::TestCase
 
   test "finding a single document by id" do
     mongo_document = @mongo_collection.save({:testing => true, :rating => 5, :title => 'testing', :_id => 1})
-    assert_equal @collection.find(1).attributes['testing'], @mongo_collection.find_one(:_id => 1)['testing']
-    assert_equal @collection.find(1).attributes['rating'], @mongo_collection.find_one(:_id => 1)['rating']
-    assert_equal @collection.find(1).attributes['title'], @mongo_collection.find_one(:_id => 1)['title']
-    assert_kind_of Rack::JSON::Document, @collection.find(1)
+    assert_equal @collection.find_one(1).attributes['testing'], @mongo_collection.find_one(:_id => 1)['testing']
+    assert_kind_of Rack::JSON::Document, @collection.find_one(1)
   end
 
   def test_finding_documents_using_search_conditions
@@ -90,7 +88,7 @@ class CollectionTest < Test::Unit::TestCase
     assert_equal @collection.all.length, 0
     assert @collection.create({:_id => 1, :title => 'testing'})
     assert_equal @collection.all.length, 1
-    assert_equal @collection.find(1).attributes["title"], "testing"
+    assert_equal @collection.find_one(1).attributes["title"], "testing"
   end
 
   def test_updating_an_existing_document_by_id
@@ -98,7 +96,7 @@ class CollectionTest < Test::Unit::TestCase
     assert_equal @collection.all.length, 1
     assert @collection.exists?(1)
     assert @collection.update(1, {:testing => false})
-    assert_equal @collection.find(1).attributes["testing"], false
+    assert_equal @collection.find_one(1).attributes["testing"], false
   end
 
   def test_updating_an_existing_document_but_selector_fails
@@ -106,6 +104,6 @@ class CollectionTest < Test::Unit::TestCase
     assert_equal @collection.all.length, 1
     assert @collection.exists?(1)
     assert !@collection.update(1, {:testing => false}, {:rating => 6})
-    assert_equal @collection.find(1).attributes["testing"], true
+    assert_equal @collection.find_one(1).attributes["testing"], true
   end
 end

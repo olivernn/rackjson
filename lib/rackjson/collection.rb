@@ -25,11 +25,11 @@ module Rack::JSON
     end
 
     def find(selector, options={})
-      if selector.is_a? Hash
-        @collection.find(selector, options).inject([]) {|documents, row| documents << Rack::JSON::Document.new(row)}
-      else
-        Rack::JSON::Document.new(@collection.find_one(:_id => selector))
-      end
+      @collection.find(selector, options).inject([]) {|documents, row| documents << Rack::JSON::Document.new(row)}
+    end
+
+    def find_one(selector, options={})
+      find(prepared(selector), options).first
     end
 
     def save(document)
@@ -49,6 +49,5 @@ module Rack::JSON
     def prepared selector
       selector.is_a?(Hash) ? selector : {:_id => selector}
     end
-
   end
 end

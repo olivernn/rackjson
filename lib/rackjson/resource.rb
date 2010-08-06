@@ -33,14 +33,22 @@ module Rack::JSON
 
     [:get, :head].each do |method|
       define_method method do |request|
-        request.query.selector.merge!({:_id => request.resource_id}) if request.member_path?
-        documents = @collection.find(request.query.selector, request.query.options)
-        if documents.empty? && request.member_path?
-          render "document not found", :status => 404, :head => (method == :head)
-        else
-          render documents, :head => (method == :head)
-        end
+        request.member_path? ? get_member(request, method) : get_collection(request, method)
       end
+    end
+
+    def get_member(request, method)
+      request.query.selector.merge!({:_id => request.resource_id})
+      document = @collection.find_one(request.query.selector, request.query.options)
+      if document
+        render document, :head => (method == :head)
+      else
+        render "document not found", :status => 404, :head => (method == :head)
+      end
+    end
+
+    def get_collection(request, method)
+      render @collection.find(request.query.selector, request.query.options)
     end
 
     def options(request)
