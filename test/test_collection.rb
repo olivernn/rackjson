@@ -86,7 +86,7 @@ class CollectionTest < Test::Unit::TestCase
 
   def test_creating_a_document
     assert_equal @collection.all.length, 0
-    assert @collection.create({:_id => 1, :title => 'testing'})
+    assert @collection.save({:_id => 1, :title => 'testing'})
     assert_equal @collection.all.length, 1
     assert_equal @collection.find_one(1).attributes["title"], "testing"
   end

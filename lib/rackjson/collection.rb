@@ -4,18 +4,16 @@ module Rack::JSON
       @collection = collection
     end
 
+    # convinience method for testing
     def all(options={})
       @collection.find({}, options).to_a
-    end
-
-    def create(document)
-      @collection.save(document)
     end
 
     def delete(selector={})
       @collection.remove(prepared(selector))
     end
 
+    # convinience method for testing
     def delete_all
       @collection.remove
     end

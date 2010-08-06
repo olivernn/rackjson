@@ -62,7 +62,7 @@ module Rack::JSON
 
     def post(request)
       document = Rack::JSON::Document.new(request.json)
-      @collection.create(document.attributes)
+      @collection.save(document.attributes)
       render document.to_json, :status => 201
     rescue JSON::ParserError => error
       invalid_json error
