@@ -38,7 +38,7 @@ module Rack::JSON
         if documents.empty? && request.member_path?
           render "document not found", :status => 404, :head => (method == :head)
         else
-          render JSON.generate(documents), :head => (method == :head)
+          render documents, :head => (method == :head)
         end
       end
     end
@@ -70,7 +70,7 @@ module Rack::JSON
       document = Rack::JSON::Document.new(request.json)
       document.add_id(request.resource_id)
       if @collection.update(request.resource_id, document.attributes, request.query.selector)
-        render document.to_json, :status => 200
+        render document, :status => 200
       else
         render "document not found", :status => 404
       end
@@ -80,7 +80,7 @@ module Rack::JSON
       document = Rack::JSON::Document.new(request.json)
       document.add_id(request.resource_id)
       @collection.save(document.attributes)
-      render document.to_json, :status => 201
+      render document, :status => 201
     end
 
     METHODS_NOT_ALLOWED.each do |method|
