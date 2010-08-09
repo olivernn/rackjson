@@ -23,6 +23,16 @@ In your rackup file:
 
 This will set up a RESTful resource called 'notes' at /notes which will store any JSON document.
 
+### Options
+
+Currently you can choose which HTTP verbs the resource will support using the `:only` and `:except` options.  For example this will expose the notes resource to only get methods:
+
+    expose_resource :collections => [:notes], :db => Mongo::Connection.new.db("mydb"), :only => [:get]
+
+And to allow every kind of method except deletes:
+
+    expose_resource :collections => [:notes], :db => Mongo::Connection.new.db("mydb"), :except => [:delete]
+
 ### Restricting Access
 
 There are three ways of mounting a restful resource with rackjson:
@@ -88,7 +98,7 @@ RackJSON will assign an id to this resource as _id.  This can be used to access 
     Content-Type: application/json
     Content-Length: 147
     
-    [{"updated_at":"Sun Apr 11 11:14:17 UTC 2010","title":"hello world!","_id":"4bc1af0934701204fd000001","created_at":"Sun Apr 11 11:14:17 UTC 2010"}]
+    {"updated_at":"Sun Apr 11 11:14:17 UTC 2010","title":"hello world!","_id":"4bc1af0934701204fd000001","created_at":"Sun Apr 11 11:14:17 UTC 2010"}
 
 This resource will also appear in the index of notes resources
 
