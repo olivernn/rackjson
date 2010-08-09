@@ -1,18 +1,21 @@
 module Rack::JSON
   class Resource
     include Rack::JSON::EndPoint
-    METHODS_NOT_ALLOWED = [:trace, :connect]
+    HTTP_METHODS = [:get, :post, :put, :delete]
 
     def initialize(app, options)
       @app = app
       @collections = options[:collections]
       @db = options[:db]
+      @methods = options[:only] || HTTP_METHODS - (options[:except] || [])
     end
 
     def call(env)
       request = Rack::JSON::Request.new(env)
       if bypass? request
         @app.call(env)
+      elsif method_not_allowed? request
+        render "", :status => 405
       else
         @collection = Rack::JSON::Collection.new(@db[request.collection])
         send(request.request_method.downcase, request)
@@ -49,6 +52,10 @@ module Rack::JSON
 
     def get_collection(request, method)
       render @collection.find(request.query.selector, request.query.options)
+    end
+
+    def not_allowed?(request)
+      
     end
 
     def options(request)
@@ -91,10 +98,5 @@ module Rack::JSON
       render document, :status => 201
     end
 
-    METHODS_NOT_ALLOWED.each do |method|
-      define_method method do |request|
-        render "", :status => 405
-      end
-    end
   end
 end

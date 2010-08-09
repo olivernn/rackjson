@@ -19,6 +19,10 @@ module Rack::JSON
       render (error.class.to_s + " :" + error.message), :status => 422
     end
 
+    def method_not_allowed? request
+      bypass_method? request
+    end
+
     def render body, options={}
       Rack::JSON::Response.new(body, options).to_a
     end
