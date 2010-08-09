@@ -8,7 +8,7 @@ module Rack::JSON
     def self.create(doc)
       if doc.is_a? String
         Rack::JSON::JSONDocument.new(doc)
-      elsif doc.is_a? OrderedHash
+      elsif doc.is_a? BSON::OrderedHash
         Rack::JSON::MongoDocument.new(doc)
       else
         raise Rack::JSON::Document::BadDocumentFormatError

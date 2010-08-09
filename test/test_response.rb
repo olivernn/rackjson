@@ -32,7 +32,7 @@ class ResponseTest < Test::Unit::TestCase
   end
 
   test "sending document" do
-    h = OrderedHash.new
+    h = BSON::OrderedHash.new
     h[:title] = 'Hello'
     response = Rack::JSON::Response.new(Rack::JSON::Document.create(h))
     assert_match(JSON.parse(response.body)['title'], 'Hello')
