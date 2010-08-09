@@ -13,7 +13,7 @@ module Rack::JSON
     end
 
     def find(selector, options={})
-      @collection.find(selector, options).inject([]) {|documents, row| documents << Rack::JSON::Document.new(row)}
+      @collection.find(selector, options).inject([]) {|documents, row| documents << Rack::JSON::Document.create(row)}
     end
 
     def find_one(selector, options={})
@@ -21,12 +21,12 @@ module Rack::JSON
     end
 
     def save(document)
-      @collection.save(document)
+      @collection.save(document.to_h)
     end
 
     def update(selector, document, query={})
       if exists?(prepared(selector).merge(query))
-        @collection.update(prepared(selector).merge(query), document, :upsert => false)
+        @collection.update(prepared(selector).merge(query), document.to_h, :upsert => false)
       else
         false
       end

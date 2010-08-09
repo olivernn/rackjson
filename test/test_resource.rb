@@ -40,14 +40,14 @@ class ResourceTest < Test::Unit::TestCase
     assert_match /"testing":true/, last_response.body
   end
 
-  test "test creating a document" do
+  test "creating a document" do
     put '/testing/1', '{"title": "testing"}'
     assert_equal 201, last_response.status
     assert_match /"_id":1/, last_response.body
     assert_match /"title":"testing"/, last_response.body
   end
 
-  test "test show a single document" do
+  test "show a single document" do
     put '/testing/1', '{"title": "testing first"}'
     post '/testing', '{"title": "testing second"}'
     get '/testing/1'
@@ -57,13 +57,13 @@ class ResourceTest < Test::Unit::TestCase
     assert_instance_of Hash, JSON.parse(last_response.body)
   end
 
-  test "test not finding a specific document" do
+  test "not finding a specific document" do
     get '/testing/1'
     assert_equal 404, last_response.status
     assert_equal "document not found", last_response.body
   end
 
-  test "test index method with query parameters" do
+  test "index method with query parameters" do
     @collection.save({:testing => true, :rating => 5, :title => 'testing'})
     get '/testing?[?title=testing]'
     assert last_response.ok?
@@ -73,7 +73,7 @@ class ResourceTest < Test::Unit::TestCase
     assert_match /"title":"testing"/, last_response.body
   end
 
-  test "test index method with sort" do
+  test "index method with sort" do
     @collection.save({:testing => true, :rating => 5, :title => 'testing'})
     get '/testing?[/title]'
     assert last_response.ok?
@@ -83,17 +83,16 @@ class ResourceTest < Test::Unit::TestCase
     assert_match /"title":"testing"/, last_response.body
   end
 
-  test "test putting a new document" do
+  test "putting a new document" do
     put '/testing/1', '{"title": "testing update"}'
     assert_equal 201, last_response.status
     assert_match /"_id":1/, last_response.body
     assert_match /"title":"testing update"/, last_response.body
   end
 
-  test "test updating a document" do
+  test "updating a document" do
     @collection.save({:title => 'testing', :_id => 1})
     put '/testing/1', '{"title": "testing update"}'
-    assert last_response.ok?
     assert_match /"_id":1/, last_response.body
     assert_match /"title":"testing update"/, last_response.body
   end

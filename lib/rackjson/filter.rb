@@ -21,7 +21,7 @@ module Rack::JSON
     private
 
     def append_filters_to_document_in request
-      document = Rack::JSON::Document.new(request.json)
+      document = Rack::JSON::Document.create(request.json)
       document.add_attributes(request.session.reject { |key, value| !@filters.include?(key.to_sym) })
       request.set_body(document.to_json)
     end

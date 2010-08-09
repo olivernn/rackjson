@@ -32,23 +32,7 @@ class JSONDocumentTest < Test::Unit::TestCase
     doc = JSON.generate hash
     assert_equal(hash["_id"], Rack::JSON::JSONDocument.new(doc).attributes["_id"])
   end
-  
-  def test_adding_an_id
-    hash = { "test" => "I don't have an ID" }
-    doc = JSON.generate hash
-    json_doc = Rack::JSON::JSONDocument.new(doc)
-    json_doc.add_id(1)
-    assert_equal(1, json_doc.attributes["_id"])
-  end
-  
-  def test_not_overriding_an_id
-    hash = { "test" => "I do have an ID", "_id" => 2 }
-    doc = JSON.generate hash
-    json_doc = Rack::JSON::JSONDocument.new(doc)
-    json_doc.add_id(1)
-    assert_equal(2 , json_doc.attributes["_id"])
-  end
-  
+
   def test_adding_timestamps
     hash = { "_id" => 1 }
     doc = JSON.generate hash

@@ -1,32 +1,50 @@
 module Rack::JSON
   class Document
 
-    def initialize(doc)
+    attr_accessor :attributes
+
+    class BadDocumentFormatError < ArgumentError ; end
+
+    def self.create(doc)
       if doc.is_a? String
-        @document = Rack::JSON::JSONDocument.new(doc)
-      else doc.is_a? OrderedHash
-        @document = Rack::JSON::MongoDocument.new(doc)
+        Rack::JSON::JSONDocument.new(doc)
+      elsif doc.is_a? OrderedHash
+        Rack::JSON::MongoDocument.new(doc)
+      else
+        raise Rack::JSON::Document::BadDocumentFormatError
       end
     end
+
 
     def add_attributes(pair)
-      @document.attributes.merge!(pair)
+      attributes.merge!(pair)
     end
 
-    def method_missing(name, *args)
-      @document.send(name, *args)
+    def set_id(val)
+      add_attributes('_id' => val) unless attributes.keys.include? '_id'
     end
 
-    def to_json(*a)
-      unless @json
-        gen_attrs = @document.attributes
-        gen_attrs.each_pair do |key, value|
-          if value.is_a? BSON::ObjectID
-            gen_attrs[key] = gen_attrs[key].to_s
-          end
+    def to_h
+      attributes
+    end
+
+    def to_json
+      attributes.to_json
+    end
+
+    private
+
+    def set_attribute_created_at
+      attributes["created_at"] = Time.now unless attributes["created_at"]
+    end
+
+    def set_attributes
+      private_methods.each do |method|
+        if method.match /^set_attribute_\w*$/
+          send method
         end
       end
-      gen_attrs.to_json
     end
+
   end
 end

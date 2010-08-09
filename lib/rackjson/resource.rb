@@ -61,9 +61,9 @@ module Rack::JSON
     end
 
     def post(request)
-      document = Rack::JSON::Document.new(request.json)
-      @collection.save(document.attributes)
-      render document.to_json, :status => 201
+      document = Rack::JSON::Document.create(request.json)
+      @collection.save(document)
+      render document, :status => 201
     rescue JSON::ParserError => error
       invalid_json error
     end
@@ -75,9 +75,9 @@ module Rack::JSON
     end
 
     def update(request)
-      document = Rack::JSON::Document.new(request.json)
-      document.add_id(request.resource_id)
-      if @collection.update(request.resource_id, document.attributes, request.query.selector)
+      document = Rack::JSON::Document.create(request.json)
+      document.set_id(request.resource_id)
+      if @collection.update(request.resource_id, document, request.query.selector)
         render document, :status => 200
       else
         render "document not found", :status => 404
@@ -85,9 +85,9 @@ module Rack::JSON
     end
 
     def upsert(request)
-      document = Rack::JSON::Document.new(request.json)
-      document.add_id(request.resource_id)
-      @collection.save(document.attributes)
+      document = Rack::JSON::Document.create(request.json)
+      document.set_id(request.resource_id)
+      @collection.save(document)
       render document, :status => 201
     end
 

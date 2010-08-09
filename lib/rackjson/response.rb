@@ -1,6 +1,8 @@
 module Rack::JSON
   class Response
 
+    class Rack::JSON::Response::BodyFormatError < ArgumentError ; end
+
     attr_reader :status, :headers, :body
 
     def initialize(body, options={})
@@ -23,11 +25,15 @@ module Rack::JSON
     end
 
     def parse_body(body)
-      @body = JSON.generate(body)
-      @headers["Content-Type"] = "application/json"
-    rescue JSON::GeneratorError
-      @body = body
-      @headers["Content-Type"] = "text/plain"
+      if body.is_a?(Rack::JSON::Document) || body.is_a?(Array)
+        @body = body.to_json
+        @headers["Content-Type"] = "application/json"
+      elsif body.is_a? String
+        @body = body
+        @headers["Content-Type"] = "text/plain"
+      else
+        raise Rack::JSON::Response::BodyFormatError
+      end
     end
 
     def set_headers

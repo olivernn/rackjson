@@ -31,9 +31,11 @@ class ResponseTest < Test::Unit::TestCase
     assert_equal("text/plain", response.headers["Content-Type"])
   end
 
-  test "sending hash" do
-    response = Rack::JSON::Response.new({:title => 'Hello'})
-    assert_equal(JSON.generate({:title => 'Hello'}), response.body)
+  test "sending document" do
+    h = OrderedHash.new
+    h[:title] = 'Hello'
+    response = Rack::JSON::Response.new(Rack::JSON::Document.create(h))
+    assert_match(JSON.parse(response.body)['title'], 'Hello')
   end
 
   def test_head_response

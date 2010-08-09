@@ -1,8 +1,5 @@
 module Rack::JSON
-  class MongoDocument
-    include Rack::JSON::BaseDocument
-
-    attr_accessor :attributes
+  class MongoDocument < Rack::JSON::Document
 
     def initialize(row)
       @attributes = row
