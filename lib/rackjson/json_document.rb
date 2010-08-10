@@ -22,6 +22,10 @@ module Rack::JSON
       return false
     end
 
+    def set_attribute_created_at
+      attributes["created_at"] = Time.now unless attributes["created_at"]
+    end
+
     def set_attribute_updated_at
       attributes["updated_at"] = Time.now
     end
