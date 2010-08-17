@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{rackjson}
-  s.version = "0.4.0"
+  s.version = "0.3.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Oliver Nightingale"]
-  s.date = %q{2010-08-10}
+  s.date = %q{2010-08-17}
   s.description = %q{A rack end point for storing json documents.}
   s.email = %q{oliver.n@new-bamboo.co.uk}
   s.extra_rdoc_files = [
