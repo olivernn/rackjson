@@ -94,6 +94,43 @@ class ResourceTest < Test::Unit::TestCase
     assert_equal "document not found", last_response.body
   end
 
+  test "finding a field within a specific document" do
+    @collection.save({:testing => true, :rating => 5, :title => 'testing', :_id => 1})
+    get '/testing/1/title'
+    assert last_response.ok?
+    assert_equal "testing", last_response.body
+  end
+
+  test "finding an array inside a document" do
+    @collection.save({:obj => { :hello => "world"}, :ratings => [5,2], :title => 'testing', :_id => 1})
+    get '/testing/1/ratings'
+    assert last_response.ok?
+    expected = [5,2]
+    assert_equal expected, JSON.parse(last_response.body)        
+  end
+
+  test "finding an element of an array from a specific document" do
+    @collection.save({:testing => true, :ratings => [5,2], :title => 'testing', :_id => 1})
+    get '/testing/1/ratings/0'
+    assert last_response.ok?
+    assert_equal "5", last_response.body
+  end
+
+  test "finding an embedded document" do
+    @collection.save({:obj => { :hello => "world"}, :ratings => [5,2], :title => 'testing', :_id => 1})
+    get '/testing/1/obj'
+    assert last_response.ok?
+    expected = { "hello" => "world" }
+    assert_equal expected, JSON.parse(last_response.body)    
+  end
+
+  test "finding a property of an embedded document" do
+    @collection.save({:obj => { :hello => "world"}, :ratings => [5,2], :title => 'testing', :_id => 1})
+    get '/testing/1/obj/hello'
+    assert last_response.ok?
+    assert_equal "world", last_response.body
+  end
+
   test "index method with query parameters" do
     @collection.save({:testing => true, :rating => 5, :title => 'testing'})
     get '/testing?[?title=testing]'

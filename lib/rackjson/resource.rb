@@ -36,7 +36,22 @@ module Rack::JSON
 
     [:get, :head].each do |method|
       define_method method do |request|
-        request.member_path? ? get_member(request, method) : get_collection(request, method)
+        send("get_#{request.path_type}", request, method)
+      end
+    end
+
+    def get_collection(request, method)
+      render @collection.find(request.query.selector, request.query.options)
+    end
+
+    def get_field(request, method)
+      request.query.selector.merge!({:_id => request.resource_id})
+      request.query.options.merge!({:property => request.property})
+      field = @collection.find_field(request.query.selector, request.field, request.query.options)
+      if field
+        render field, :head => (method == :head)
+      else
+        render "field not found", :status => 404, :head => (method == :head)
       end
     end
 
@@ -48,14 +63,6 @@ module Rack::JSON
       else
         render "document not found", :status => 404, :head => (method == :head)
       end
-    end
-
-    def get_collection(request, method)
-      render @collection.find(request.query.selector, request.query.options)
-    end
-
-    def not_allowed?(request)
-      
     end
 
     def options(request)

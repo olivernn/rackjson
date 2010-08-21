@@ -38,6 +38,11 @@ class ResponseTest < Test::Unit::TestCase
     assert_match(JSON.parse(response.body)['title'], 'Hello')
   end
 
+  test "sending a number" do
+    response = Rack::JSON::Response.new(1)
+    assert_equal "1", response.body
+  end
+
   def test_head_response
     response = Rack::JSON::Response.new("test", :head => true)
     assert_equal([""], response.to_a[2])
