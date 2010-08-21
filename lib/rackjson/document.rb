@@ -28,7 +28,7 @@ module Rack::JSON
       attributes
     end
 
-    def to_json
+    def to_json(options={})
       attributes.to_json
     end
 
