@@ -1,11 +1,12 @@
+require 'enumerator'
+
 module Rack::JSON
   class Collection
+
+    class Rack::JSON::Collection::DataTypeError < TypeError ; end
+
     def initialize(collection)
       @collection = collection
-    end
-
-    def decrement(selector, field, query={})
-      _update(prepared(selector).merge(query), { "$inc" => { field => -1 }})
     end
 
     def delete(selector={})
@@ -29,8 +30,17 @@ module Rack::JSON
       find(prepared(selector), options).first
     end
 
-    def increment(selector, field, query={})
-      _update(prepared(selector).merge(query), { "$inc" => { field => 1 }})
+    [:increment, :decrement].each do |method_name|
+      define_method method_name do |selector, field|
+        _update(prepared(selector), { "$inc" => { field => method_name == :increment ? 1 : -1 }})
+      end
+    end
+
+    [:pull, :pull_all, :push, :push_all, :add_to_set].each do |method_name|
+      define_method method_name do |selector, field, value|
+        modifier = "$#{method_name.to_s.split('_').to_enum.each_with_index.map { |w, i| i == 0 ? w : w.capitalize }.join}"
+        _update(prepared(selector), { modifier => { field => value }})
+      end
     end
 
     def save(document)

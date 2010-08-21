@@ -45,4 +45,45 @@ class CollectionTest < Test::Unit::TestCase
     @collection.decrement(1, 'count')
     assert_equal(0, @collection.find_field(1, 'count'))
   end
+
+  test "attomic push" do
+    @collection.push(1, 'array', 'pushed value')
+    assert_equal([1,2,3,4,'pushed value'], @collection.find_field(1, 'array'))
+  end
+
+  test "attomic push on a new list" do
+    @collection.push(1, 'new-array', 'pushed value')
+    assert_equal(['pushed value'], @collection.find_field(1, 'new-array'))
+  end
+
+  # mongo isn't throwing an error when doing this, may need to upgrade
+  # test "attomic push on a non list field should raise a DataTypeError"
+
+  test "attomic push all on an existing list" do
+    @collection.push_all(1, 'array', ["a", "b", "c"])
+    assert_equal([1,2,3,4,'a','b','c'], @collection.find_field(1, 'array'))
+  end
+
+  test "attomic push all on to create a new list" do
+    @collection.push_all(1, 'new-array', ["a", "b", "c"])
+    assert_equal(["a", "b", "c"], @collection.find_field(1, 'new-array'))
+  end
+
+  test "attomic pull item form a list" do
+    @collection.pull(1, 'array', 4)
+    assert_equal([1,2,3], @collection.find_field(1, 'array'))
+  end
+
+  test "attomic pull all to remove more than one item from a list" do
+    @collection.pull_all(1, 'array', [1,2,3])
+    assert_equal([4], @collection.find_field(1, 'array'))
+  end
+
+  # currently failing because add to set is supported in mongo v1.3+
+  # test "adding an element to an array only if it doesn't already exist in the array" do
+  #   @collection.add_to_set(1, 'array', 'pushed value')
+  #   assert_equal([1,2,3,4,'pushed value'], @collection.find_field(1, 'array'))
+  #   @collection.add_to_set(1, 'array', 1)
+  #   assert_equal([1,2,3,4,'pushed value'], @collection.find_field(1, 'array'))
+  # end
 end
