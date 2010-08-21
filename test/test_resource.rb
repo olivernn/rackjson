@@ -181,6 +181,32 @@ class ResourceTest < Test::Unit::TestCase
     assert_nil @collection.find_one(:_id => 1, :user_id => 1)
   end
 
+  test "incrementing a value within a document" do
+    @collection.save({:counter => 1, :_id => 1})
+    put '/testing/1/counter/_increment'
+    assert last_response.ok?
+    assert_equal 2, @collection.find_one(:_id => 1)["counter"]
+  end
+
+  test "incrementing a non existant field" do
+    @collection.save({:_id => 1})
+    put '/testing/1/counter/_increment'
+    assert last_response.ok?
+    assert_equal 1, @collection.find_one(:_id => 1)["counter"]
+  end
+
+  test "incrementing a value on a non existent document" do
+    put '/testing/1/counter/_increment'
+    assert_equal 404, last_response.status
+  end
+
+  test "decrementing a value within a document" do
+    @collection.save({:counter => 1, :_id => 1})
+    put '/testing/1/counter/_decrement'
+    assert last_response.ok?
+    assert_equal 0, @collection.find_one(:_id => 1)["counter"]
+  end
+
   test "deleting a document" do
     @collection.save({:title => 'testing', :_id => 1})
     assert @collection.find_one({:_id => 1})

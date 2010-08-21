@@ -83,9 +83,19 @@ module Rack::JSON
     end
 
     def put(request)
-      @collection.exists?(request.resource_id) ? update(request) : upsert(request)
+      if request.modifier_path?
+        @collection.exists?(request.resource_id) ? modify(request) : render("document not found", :status => 404)
+      else
+        @collection.exists?(request.resource_id) ? update(request) : upsert(request)
+      end
     rescue JSON::ParserError => error
       invalid_json error
+    end
+
+    def modify(request)
+      request.query.selector.merge!({:_id => request.resource_id})
+      @collection.send(request.modifier[1..-1], request.query.selector, request.field)
+      render "OK", :status => 200
     end
 
     def update(request)

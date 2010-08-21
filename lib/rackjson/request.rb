@@ -33,6 +33,14 @@ module Rack::JSON
       self.path_info.match /^\/[\w-]+\/[\w-]+$/
     end
 
+    def modifier
+      modifier_path? ? path_info.split('/')[4] : nil
+    end
+
+    def modifier_path?
+      path_info.match /^\/[\w-]+\/[\w-]+\/[\w-]+\/(_increment|_decrement)$/
+    end
+
     def path_type
       if member_path?
         :member
