@@ -41,9 +41,19 @@ class CollectionTest < Test::Unit::TestCase
     assert_equal(2, @collection.find_field(1, 'count'))
   end
 
+  test "incrementing by more than 1" do
+    @collection.increment(1, 'count', 2)
+    assert_equal(3, @collection.find_field(1, 'count'))
+  end
+
   test "attomic decrement" do
     @collection.decrement(1, 'count')
     assert_equal(0, @collection.find_field(1, 'count'))
+  end
+
+  test "decrementing by more than 1" do
+    @collection.decrement(1, 'count', 2)
+    assert_equal(-1, @collection.find_field(1, 'count'))
   end
 
   test "attomic push" do

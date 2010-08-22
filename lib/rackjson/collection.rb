@@ -31,8 +31,9 @@ module Rack::JSON
     end
 
     [:increment, :decrement].each do |method_name|
-      define_method method_name do |selector, field|
-        _update(prepared(selector), { "$inc" => { field => method_name == :increment ? 1 : -1 }})
+      define_method method_name do |selector, field, *val|
+        value = *val.first || 1
+        _update(prepared(selector), { "$inc" => { field => method_name == :increment ? value : (-1 * value) }})
       end
     end
 
