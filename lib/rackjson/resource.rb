@@ -26,7 +26,7 @@ module Rack::JSON
 
     def delete(request)
       if request.member_path?
-        if @collection.delete({:_id => request.resource_id})
+        if @collection.delete(request.query.selector)
           render "{'ok': true}"
         end
       else
@@ -45,7 +45,6 @@ module Rack::JSON
     end
 
     def get_field(request, method)
-      request.query.selector.merge!({:_id => request.resource_id})
       request.query.options.merge!({:property => request.property})
       field = @collection.find_field(request.query.selector, request.field, request.query.options)
       if field
@@ -56,7 +55,6 @@ module Rack::JSON
     end
 
     def get_member(request, method)
-      request.query.selector.merge!({:_id => request.resource_id})
       document = @collection.find_one(request.query.selector, request.query.options)
       if document
         render document, :head => (method == :head)
@@ -93,7 +91,6 @@ module Rack::JSON
     end
 
     def modify(request)
-      request.query.selector.merge!({:_id => request.resource_id})
       @collection.send(request.modifier[1..-1], request.query.selector, request.field, request.modifier_value)
       render "OK", :status => 200
     end

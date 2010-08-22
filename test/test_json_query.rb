@@ -61,6 +61,12 @@ class QueryTest < Test::Unit::TestCase
     assert_equal({:price => {'$lt' => 10}}, query.selector)
   end
 
+  test "automatically merging in the _id from the resource id" do
+    json_query = '[?name=bob!]'
+    query = Rack::JSON::JSONQuery.new(json_query, :resource_id => 1)
+    assert_equal({:_id => 1, :name => 'bob!'}, query.selector)
+  end
+
   # def test_single_greater_than_or_equal_condition
   #   json_query = '[?price=<10]'
   #   query = Rack::JSON::JSONQuery.new(json_query)
