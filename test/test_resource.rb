@@ -195,6 +195,13 @@ class ResourceTest < Test::Unit::TestCase
     assert_equal 1, @collection.find_one(:_id => 1)["counter"]
   end
 
+  test "incrementing a value within a document by a custom amount" do
+    @collection.save({:counter => 1, :_id => 1})
+    put '/testing/1/counter/_increment', '{"value" : 10}'
+    assert last_response.ok?
+    assert_equal 11, @collection.find_one(:_id => 1)["counter"]
+  end
+
   test "incrementing a value on a non existent document" do
     put '/testing/1/counter/_increment'
     assert_equal 404, last_response.status
@@ -206,6 +213,56 @@ class ResourceTest < Test::Unit::TestCase
     assert last_response.ok?
     assert_equal 0, @collection.find_one(:_id => 1)["counter"]
   end
+
+  test "push a simple value onto an array within a document" do
+    @collection.save({:list => [1,2,3], :_id => 1})
+    put '/testing/1/list/_push', '{"value" : 4}'
+    assert last_response.ok?
+    assert_equal [1,2,3,4], @collection.find_one(:_id => 1)['list']
+  end
+
+  test "push an object onto an array within a document" do
+    @collection.save({:list => [1,2,3], :_id => 1})
+    put '/testing/1/list/_push', '{"value" : { "foo": "bar" }}'
+    assert last_response.ok?
+    assert_equal [1,2,3,{"foo" => "bar"}], @collection.find_one(:_id => 1)['list']
+  end
+
+  test "push more than one item onto an array within a document" do
+    @collection.save({:list => [1,2,3], :_id => 1})
+    put '/testing/1/list/_push_all', '{"value" : [4,5,6,7]}'
+    assert last_response.ok?
+    assert_equal [1,2,3,4,5,6,7], @collection.find_one(:_id => 1)['list']
+  end
+
+  test "pull a simple value from an array within a document" do
+    @collection.save({:list => [1,2,3], :_id => 1})
+    put '/testing/1/list/_pull', '{"value" : 2}'
+    assert last_response.ok?
+    assert_equal [1,3], @collection.find_one(:_id => 1)['list']
+  end
+
+  test "pull an object from an array within a document" do
+    @collection.save({:list => [1,2,3,{"foo" => "bar"}], :_id => 1})
+    put '/testing/1/list/_pull', '{"value" : { "foo": "bar" }}'
+    assert last_response.ok?
+    assert_equal [1,2,3], @collection.find_one(:_id => 1)['list']
+  end
+
+  test "pull more than one item from an array within a document" do
+    @collection.save({:list => [1,2,3,4,5,6,7], :_id => 1})
+    put '/testing/1/list/_pull_all', '{"value" : [4,5,6,7]}'
+    assert last_response.ok?
+    assert_equal [1,2,3], @collection.find_one(:_id => 1)['list']
+  end
+
+  # requires mongodb version > 1.3
+  # test "adding an item to a set" do
+  #   @collection.save({:list => [1,2,3], :_id => 1})
+  #   put '/testing/1/list/_add_to_set', '{"value" : 4}'
+  #   assert last_response.ok?
+  #   assert_equal [1,2,3,4], @collection.find_one(:_id => 1)['list']
+  # end
 
   test "deleting a document" do
     @collection.save({:title => 'testing', :_id => 1})

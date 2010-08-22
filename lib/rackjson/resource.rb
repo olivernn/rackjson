@@ -94,7 +94,7 @@ module Rack::JSON
 
     def modify(request)
       request.query.selector.merge!({:_id => request.resource_id})
-      @collection.send(request.modifier[1..-1], request.query.selector, request.field)
+      @collection.send(request.modifier[1..-1], request.query.selector, request.field, request.modifier_value)
       render "OK", :status => 200
     end
 

@@ -38,7 +38,11 @@ module Rack::JSON
     end
 
     def modifier_path?
-      path_info.match /^\/[\w-]+\/[\w-]+\/[\w-]+\/(_increment|_decrement)$/
+      path_info.match /^\/[\w-]+\/[\w-]+\/[\w-]+\/(_increment|_decrement|_push|_pull|_push_all|_pull_all|_add_to_set)$/
+    end
+
+    def modifier_value
+      json.empty? ? nil : JSON.parse(json)['value']
     end
 
     def path_type
