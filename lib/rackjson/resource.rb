@@ -36,7 +36,11 @@ module Rack::JSON
 
     [:get, :head].each do |method|
       define_method method do |request|
-        send("get_#{request.path_type}", request, method)
+        begin
+          send("get_#{request.path_type}", request, method)
+        rescue Rack::JSON::Request::UnrecognisedPathTypeError => error
+          bad_request error
+        end
       end
     end
 

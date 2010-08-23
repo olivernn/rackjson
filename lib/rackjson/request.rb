@@ -1,5 +1,8 @@
 module Rack::JSON
   class Request < Rack::Request
+
+    class Rack::JSON::Request::UnrecognisedPathTypeError < StandardError ; end
+
     include Rack::Utils
 
     attr_reader :env
@@ -52,6 +55,8 @@ module Rack::JSON
         :collection
       elsif field_path?
         :field
+      else
+        raise UnrecognisedPathTypeError
       end
     end
 
