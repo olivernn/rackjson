@@ -82,4 +82,11 @@ class DocumentTest < Test::Unit::TestCase
     assert_equal("01/01/2010", document.attributes["created_at"])
     assert_equal(Time.now.to_s, document.attributes["updated_at"].to_s)
   end
+
+  test "accessing getting a single attribute from a document" do
+    json = '{"test":"hello", "nested":{"foo":"bar"}}'
+    document = Rack::JSON::Document.create(json)
+    assert_equal "hello", document.field(["test"])
+    assert_equal "bar", document.field(["nested", "foo"])
+  end
 end

@@ -21,9 +21,8 @@ module Rack::JSON
       @collection.find(selector, options).inject([]) {|documents, row| documents << Rack::JSON::Document.create(row)}
     end
 
-    def find_field(selector, field, options={})
-      field = find_one(prepared(selector)).attributes[field]
-      options[:property] ? field[options[:property]] : field
+    def find_field(selector, fields, options={})
+      find_one(prepared(selector)).field(fields)
     end
 
     def find_one(selector, options={})
@@ -33,14 +32,14 @@ module Rack::JSON
     [:increment, :decrement].each do |method_name|
       define_method method_name do |selector, field, *val|
         value = *val.first || 1
-        _update(prepared(selector), { "$inc" => { field => method_name == :increment ? value : (-1 * value) }})
+        _update(prepared(selector), { "$inc" => { dot_notate(field) => method_name == :increment ? value : (-1 * value) }})
       end
     end
 
     [:pull, :pull_all, :push, :push_all, :add_to_set].each do |method_name|
       define_method method_name do |selector, field, value|
         modifier = "$#{method_name.to_s.split('_').to_enum.each_with_index.map { |w, i| i == 0 ? w : w.capitalize }.join}"
-        _update(prepared(selector), { modifier => { field => value }})
+        _update(prepared(selector), { modifier => { dot_notate(field) => value }})
       end
     end
 
@@ -57,6 +56,10 @@ module Rack::JSON
     end
 
     private
+
+    def dot_notate field
+      field.is_a?(Array) ? field.join(".") : field
+    end
 
     def prepared selector
       selector.is_a?(Hash) ? selector : {:_id => selector}

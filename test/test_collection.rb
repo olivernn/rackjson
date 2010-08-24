@@ -13,27 +13,27 @@ class CollectionTest < Test::Unit::TestCase
   end
 
   test "should be able to retrieve a specific element from a document in the collection" do
-    assert_equal('foo', @collection.find_field(1, 'field'))
+    assert_equal('foo', @collection.find_field(1, ['field']))
   end
 
   test "should return nil if there is no matching field" do
-    assert_nil(@collection.find_field(1, 'non-existant-field'))
+    assert_nil(@collection.find_field(1, ['non-existant-field']))
   end
 
   test "should be able to retrieve a specific element form an array" do
-    assert_equal(2, @collection.find_field(1, 'array', :property => 1))
+    assert_equal(2, @collection.find_field(1, ['array', 1]))
   end
 
   test "should return nil if asking for an array element that doesn't exist" do
-    assert_nil(@collection.find_field(1, 'array', :property => 100))
+    assert_nil(@collection.find_field(1, ['array', 100]))
   end
 
   test "should be able to retrieve a specific element from an embedded object" do
-    assert_equal('baz', @collection.find_field(1, 'obj', :property => 'field'))
+    assert_equal('baz', @collection.find_field(1, ['obj', 'field']))
   end
 
   test "should return nil if asking for an element that doesn't exist on the embeded object" do
-    assert_nil(@collection.find_field(1, 'obj', :property => 'non-existant'))
+    assert_nil(@collection.find_field(1, ['obj', 'nonexistant']))
   end
 
   test "attomic increment" do

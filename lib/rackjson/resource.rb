@@ -49,8 +49,7 @@ module Rack::JSON
     end
 
     def get_field(request, method)
-      request.query.options.merge!({:property => request.property})
-      field = @collection.find_field(request.query.selector, request.field, request.query.options)
+      field = @collection.find_field(request.query.selector, request.fields, request.query.options)
       if field
         render field, :head => (method == :head)
       else
@@ -95,7 +94,7 @@ module Rack::JSON
     end
 
     def modify(request)
-      @collection.send(request.modifier[1..-1], request.query.selector, request.field, request.modifier_value)
+      @collection.send(request.modifier[1..-1], request.query.selector, request.fields, request.modifier_value)
       render "OK", :status => 200
     end
 

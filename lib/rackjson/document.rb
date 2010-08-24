@@ -15,9 +15,20 @@ module Rack::JSON
       end
     end
 
-
     def add_attributes(pair)
       attributes.merge!(pair)
+    end
+
+    def field(field_names)
+      attrs = attributes
+      field_names.each do |field_name|
+        if attrs.is_a? Array
+          attrs = attrs[field_name.to_i]
+        else
+          attrs = attrs[field_name]
+        end
+      end
+      attrs
     end
 
     def set_id(val)

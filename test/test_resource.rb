@@ -106,7 +106,7 @@ class ResourceTest < Test::Unit::TestCase
     get '/testing/1/ratings'
     assert last_response.ok?
     expected = [5,2]
-    assert_equal expected, JSON.parse(last_response.body)        
+    assert_equal expected, JSON.parse(last_response.body)
   end
 
   test "finding an element of an array from a specific document" do
@@ -121,7 +121,7 @@ class ResourceTest < Test::Unit::TestCase
     get '/testing/1/obj'
     assert last_response.ok?
     expected = { "hello" => "world" }
-    assert_equal expected, JSON.parse(last_response.body)    
+    assert_equal expected, JSON.parse(last_response.body)
   end
 
   test "finding a property of an embedded document" do
@@ -129,6 +129,13 @@ class ResourceTest < Test::Unit::TestCase
     get '/testing/1/obj/hello'
     assert last_response.ok?
     assert_equal "world", last_response.body
+  end
+
+  test "modifying a property of an embedded document" do
+    @collection.save({:obj => { :counter => 1}, :_id => 1})
+    put '/testing/1/obj/counter/_increment'
+    assert last_response.ok?
+    assert_equal 2, @collection.find_one(:_id => 1)["obj"]["counter"]
   end
 
   test "index method with query parameters" do

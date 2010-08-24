@@ -28,8 +28,12 @@ module Rack::JSON
       path_info.split('/')[3] || ""
     end
 
+    def fields
+      path_info.split('/').slice(3..-1).reject { |f| f.match(/(_increment|_decrement|_push|_pull|_push_all|_pull_all|_add_to_set)/)} || []
+    end
+
     def field_path?
-      path_info.match /^\/[\w-]+\/[\w-]+\/[\w-]+(\/[\w-]+)?$/
+      path_info.match(/^\/[\w-]+\/[\w-]+\/[\w-]+(\/[\w-]+)*$/) && !modifier_path?
     end
 
     def member_path?
@@ -37,11 +41,11 @@ module Rack::JSON
     end
 
     def modifier
-      modifier_path? ? path_info.split('/')[4] : nil
+      modifier_path? ? path_info.split('/').last : nil
     end
 
     def modifier_path?
-      path_info.match /^\/[\w-]+\/[\w-]+\/[\w-]+\/(_increment|_decrement|_push|_pull|_push_all|_pull_all|_add_to_set)$/
+      path_info.match /^\/[\w-]+\/[\w-]+\/[\w-]+(\/[\w-]+)*\/(_increment|_decrement|_push|_pull|_push_all|_pull_all|_add_to_set)$/
     end
 
     def modifier_value
@@ -51,10 +55,10 @@ module Rack::JSON
     def path_type
       if member_path?
         :member
-      elsif collection_path?
-        :collection
       elsif field_path?
         :field
+      elsif collection_path?
+        :collection
       else
         raise UnrecognisedPathTypeError
       end
