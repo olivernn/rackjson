@@ -67,7 +67,12 @@ class CollectionTest < Test::Unit::TestCase
   end
 
   # mongo isn't throwing an error when doing this, may need to upgrade
-  # test "attomic push on a non list field should raise a DataTypeError"
+  # still not throwing an error in 1.6
+  # test "attomic push on a non list field should raise a DataTypeError" do
+  #   assert_raises Rack::JSON::Collection::DataTypeError do
+  #     @collection.push(1, 'count', 'pushed value')
+  #   end
+  # end
 
   test "attomic push all on an existing list" do
     @collection.push_all(1, 'array', ["a", "b", "c"])
@@ -90,10 +95,31 @@ class CollectionTest < Test::Unit::TestCase
   end
 
   # currently failing because add to set is supported in mongo v1.3+
-  # test "adding an element to an array only if it doesn't already exist in the array" do
-  #   @collection.add_to_set(1, 'array', 'pushed value')
-  #   assert_equal([1,2,3,4,'pushed value'], @collection.find_field(1, 'array'))
-  #   @collection.add_to_set(1, 'array', 1)
-  #   assert_equal([1,2,3,4,'pushed value'], @collection.find_field(1, 'array'))
-  # end
+  test "adding an element to an array only if it doesn't already exist in the array" do
+    @collection.add_to_set(1, 'array', 'pushed value')
+    assert_equal([1,2,3,4,'pushed value'], @collection.find_field(1, 'array'))
+    @collection.add_to_set(1, 'array', 1)
+    assert_equal([1,2,3,4,'pushed value'], @collection.find_field(1, 'array'))
+  end
+
+  test "updating a specific field of a document" do
+    @collection.update_field(1, 'field', 'bar')
+    assert_equal('bar', @collection.find_field(1, 'field'))
+  end
+
+  test "updating a field that doesn't currently exist in a document" do
+    @collection.update_field(1, 'new-field', 'bar')
+    assert_equal('bar', @collection.find_field(1, 'new-field'))
+  end
+
+  test "updating a nested field in a document" do
+    @collection.update_field(1, ['obj', 'field'], 'blah')
+    assert_equal('blah', @collection.find_field(1, ['obj', 'field']))
+  end
+
+  test "deleting a specific field from a document" do
+    @collection.delete_field(1, 'field')
+    assert_nil(@collection.find_field(1, 'field'))
+  end
+
 end

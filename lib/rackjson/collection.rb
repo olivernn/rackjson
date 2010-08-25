@@ -13,6 +13,10 @@ module Rack::JSON
       @collection.remove(prepared(selector))
     end
 
+    def delete_field(selector, field)
+      _update(prepared(selector), { "$unset" => { dot_notate(field) => 1 }})
+    end
+
     def exists?(selector)
       !@collection.find(prepared(selector)).to_a.empty?
     end
@@ -53,6 +57,10 @@ module Rack::JSON
       else
         false
       end
+    end
+
+    def update_field(selector, field, value)
+      _update(prepared(selector), { "$set" => { dot_notate(field) => value }})
     end
 
     private

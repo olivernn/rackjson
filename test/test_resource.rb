@@ -188,6 +188,26 @@ class ResourceTest < Test::Unit::TestCase
     assert_nil @collection.find_one(:_id => 1, :user_id => 1)
   end
 
+  test "updating a field within a document" do
+    @collection.save({:title => 'testing', :_id => 1})
+    put '/testing/1/title', '{"value": "updated"}'
+    assert last_response.ok?
+    assert_equal "updated", @collection.find_one(:_id => 1)['title']
+  end
+
+  test "creating a new field within an existing documennt" do
+    @collection.save({:title => 'testing', :_id => 1})
+    put '/testing/1/new_field', '{"value": "created"}'
+    assert last_response.ok?
+    assert_equal "created", @collection.find_one(:_id => 1)['new_field']
+  end
+
+  test "trying to create a new field within a non-existant document" do
+    @collection.save({:title => 'testing', :_id => 1})
+    put '/testing/2/title', '{"value": "updated"}'
+    assert_equal 404, last_response.status
+  end
+
   test "incrementing a value within a document" do
     @collection.save({:counter => 1, :_id => 1})
     put '/testing/1/counter/_increment'
@@ -277,6 +297,14 @@ class ResourceTest < Test::Unit::TestCase
     delete '/testing/1'
     assert last_response.ok?
     assert_nil @collection.find_one({:_id => 1})
+  end
+
+  test "deleting a field within a document" do
+    @collection.save({:title => 'testing', :_id => 1})
+    assert @collection.find_one({:_id => 1})
+    delete '/testing/1/title'
+    assert last_response.ok?
+    assert_nil @collection.find_one({:_id => 1})['title']
   end
 
   test "deleting only with member path" do

@@ -25,10 +25,12 @@ module Rack::JSON
     private
 
     def delete(request)
-      if request.member_path?
-        if @collection.delete(request.query.selector)
-          render "{'ok': true}"
-        end
+      if request.field_path?
+        @collection.delete_field(request.query.selector, request.fields)
+        render "{'ok': true}"
+      elsif request.member_path?
+        @collection.delete(request.query.selector)
+        render "{'ok': true}"
       else
         render "", :status => 405
       end
@@ -86,6 +88,8 @@ module Rack::JSON
     def put(request)
       if request.modifier_path?
         @collection.exists?(request.resource_id) ? modify(request) : render("document not found", :status => 404)
+      elsif request.field_path?
+        @collection.exists?(request.resource_id) ? update_field(request) : render("document not found", :status => 404)
       else
         @collection.exists?(request.resource_id) ? update(request) : upsert(request)
       end
@@ -106,6 +110,11 @@ module Rack::JSON
       else
         render "document not found", :status => 404
       end
+    end
+
+    def update_field(request)
+      @collection.update_field(request.query.selector, request.fields, request.modifier_value)
+      render "OK", :status => 200
     end
 
     def upsert(request)
