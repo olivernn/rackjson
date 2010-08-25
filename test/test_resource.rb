@@ -101,6 +101,11 @@ class ResourceTest < Test::Unit::TestCase
     assert_equal "testing", last_response.body
   end
 
+  test "trying to find a field within a non-existant document" do
+    get '/testing/1/title'
+    assert_equal 404, last_response.status
+  end
+
   test "finding an array inside a document" do
     @collection.save({:obj => { :hello => "world"}, :ratings => [5,2], :title => 'testing', :_id => 1})
     get '/testing/1/ratings'

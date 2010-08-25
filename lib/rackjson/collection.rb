@@ -26,7 +26,8 @@ module Rack::JSON
     end
 
     def find_field(selector, fields, options={})
-      find_one(prepared(selector)).field(fields)
+      document = find_one(prepared(selector))
+      document ? document.field(fields) : nil
     end
 
     def find_one(selector, options={})
