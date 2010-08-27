@@ -24,13 +24,19 @@ module Rack::JSON
 
     private
 
+    def create(request)
+      document = Rack::JSON::Document.create(request.json)
+      @collection.save(document)
+      render document, :status => 201
+    end
+
     def delete(request)
       if request.field_path?
         @collection.delete_field(request.query.selector, request.fields)
-        render "{'ok': true}"
+        render "", :status => 204
       elsif request.member_path?
         @collection.delete(request.query.selector)
-        render "{'ok': true}"
+        render "", :status => 204
       else
         render "", :status => 405
       end
@@ -78,17 +84,17 @@ module Rack::JSON
     end
 
     def post(request)
-      document = Rack::JSON::Document.create(request.json)
-      @collection.save(document)
-      render document, :status => 201
+      if request.collection_path?
+        create(request)
+      elsif request.modifier_path?
+        @collection.exists?(request.resource_id) ? modify(request) : render("document not found", :status => 404)
+      end
     rescue JSON::ParserError => error
       invalid_json error
     end
 
     def put(request)
-      if request.modifier_path?
-        @collection.exists?(request.resource_id) ? modify(request) : render("document not found", :status => 404)
-      elsif request.field_path?
+      if request.field_path?
         @collection.exists?(request.resource_id) ? update_field(request) : render("document not found", :status => 404)
       else
         @collection.exists?(request.resource_id) ? update(request) : upsert(request)
