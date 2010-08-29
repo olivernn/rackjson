@@ -21,7 +21,7 @@ module Rack::JSON
 
     def field(field_names)
       attrs = attributes
-      field_names.each do |field_name|
+      Array.wrap(field_names).each do |field_name|
         if attrs.is_a? Array
           attrs = attrs[field_name.to_i]
         else
