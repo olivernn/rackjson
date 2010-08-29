@@ -14,7 +14,7 @@ module Rack::JSON
     end
 
     def delete_field(selector, field)
-      _update(prepared(selector), { "$unset" => { dot_notate(field) => 1 }})
+      _update(prepared(selector), { "$unset" => { dot_notate(field) => 1 }, "$set" => { :updated_at => Time.now }})
     end
 
     def exists?(selector)
@@ -35,17 +35,17 @@ module Rack::JSON
     end
 
     def decrement(selector, field, value=1)
-      _update(prepared(selector), { "$inc" => { dot_notate(field) => -1 * (value || 1) }})
+      _update(prepared(selector), { "$inc" => { dot_notate(field) => -1 * (value || 1) }, "$set" => { :updated_at => Time.now }})
     end
 
     def increment(selector, field, value=1)
-      _update(prepared(selector), { "$inc" => { dot_notate(field) => value || 1 }})
+      _update(prepared(selector), { "$inc" => { dot_notate(field) => value || 1 }, "$set" => { :updated_at => Time.now }})
     end
 
     [:pull, :pull_all, :push, :push_all, :add_to_set].each do |method_name|
       define_method method_name do |selector, field, value|
         modifier = "$#{method_name.to_s.split('_').to_enum.each_with_index.map { |w, i| i == 0 ? w : w.capitalize }.join}"
-        _update(prepared(selector), { modifier => { dot_notate(field) => value }})
+        _update(prepared(selector), { modifier => { dot_notate(field) => value }, "$set" => { :updated_at => Time.now }})
       end
     end
 
@@ -62,7 +62,7 @@ module Rack::JSON
     end
 
     def update_field(selector, field, value)
-      _update(prepared(selector), { "$set" => { dot_notate(field) => value }})
+      _update(prepared(selector), { "$set" => { dot_notate(field) => value, :updated_at => Time.now }})
     end
 
     private
