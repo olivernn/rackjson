@@ -4,6 +4,7 @@ require 'rack'
 require 'mongo'
 require 'time'
 require 'rackjson/rack/builder'
+require 'rackjson/extensions/core/string'
 
 module Rack::JSON
 
