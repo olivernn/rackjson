@@ -88,6 +88,8 @@ module Rack::JSON
         create(request)
       elsif request.modifier_path?
         @collection.exists?(request.resource_id) ? modify(request) : render("document not found", :status => 404)
+      else
+        render "", :status => 405
       end
     rescue JSON::ParserError => error
       invalid_json error
