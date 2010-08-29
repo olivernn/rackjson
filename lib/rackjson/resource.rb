@@ -1,7 +1,7 @@
 module Rack::JSON
   class Resource
     include Rack::JSON::EndPoint
-    HTTP_METHODS = [:get, :post, :put, :delete]
+    HTTP_METHODS = [:get, :post, :put, :delete, :options]
 
     def initialize(app, options)
       @app = app
@@ -79,6 +79,10 @@ module Rack::JSON
         headers = { "Allow" => "GET, POST" }
       elsif request.member_path?
         headers = { "Allow" => "GET, PUT, DELETE" }
+      elsif request.field_path?
+        headers = { "Allow" => "GET, PUT, DELETE" }
+      elsif request.modifier_path?
+        headers = { "Allow" => "POST" }
       end
       render "", :headers => headers
     end
