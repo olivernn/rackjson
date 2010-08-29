@@ -48,10 +48,6 @@ module Rack::JSON
       path_info.match /^\/[\w-]+\/[\w-]+\/[\w-]+(\/[\w-]+)*\/(_increment|_decrement|_push|_pull|_push_all|_pull_all|_add_to_set)$/
     end
 
-    def modifier_value
-      json.empty? ? nil : JSON.parse(json)['value']
-    end
-
     def path_type
       if member_path?
         :member
@@ -61,6 +57,16 @@ module Rack::JSON
         :collection
       else
         raise UnrecognisedPathTypeError
+      end
+    end
+
+    def payload
+      if content_type == 'application/json'
+        JSON.parse(raw_body)
+      elsif raw_body.empty?
+        nil
+      else
+        raw_body.numeric? ? raw_body.to_number : raw_body
       end
     end
 
@@ -74,12 +80,16 @@ module Rack::JSON
     end
 
     def json
-      self.body.rewind
-      self.body.read
+      raw_body
     end
 
     def query
       @query ||= Rack::JSON::JSONQuery.new(unescape(query_string), :resource_id => resource_id)
+    end
+
+    def raw_body
+      self.body.rewind
+      self.body.read
     end
 
     def resource_id

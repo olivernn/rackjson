@@ -34,11 +34,12 @@ module Rack::JSON
       find(prepared(selector), options).first
     end
 
-    [:increment, :decrement].each do |method_name|
-      define_method method_name do |selector, field, *val|
-        value = *val.first || 1
-        _update(prepared(selector), { "$inc" => { dot_notate(field) => method_name == :increment ? value : (-1 * value) }})
-      end
+    def decrement(selector, field, value=1)
+      _update(prepared(selector), { "$inc" => { dot_notate(field) => -1 * (value || 1) }})
+    end
+
+    def increment(selector, field, value=1)
+      _update(prepared(selector), { "$inc" => { dot_notate(field) => value || 1 }})
     end
 
     [:pull, :pull_all, :push, :push_all, :add_to_set].each do |method_name|

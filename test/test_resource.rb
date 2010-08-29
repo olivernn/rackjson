@@ -195,21 +195,21 @@ class ResourceTest < Test::Unit::TestCase
 
   test "updating a field within a document" do
     @collection.save({:title => 'testing', :_id => 1})
-    put '/testing/1/title', '{"value": "updated"}'
+    put '/testing/1/title', "updated"
     assert last_response.ok?
     assert_equal "updated", @collection.find_one(:_id => 1)['title']
   end
 
   test "creating a new field within an existing documennt" do
     @collection.save({:title => 'testing', :_id => 1})
-    put '/testing/1/new_field', '{"value": "created"}'
+    put '/testing/1/new_field', "created"
     assert last_response.ok?
     assert_equal "created", @collection.find_one(:_id => 1)['new_field']
   end
 
   test "trying to create a new field within a non-existant document" do
     @collection.save({:title => 'testing', :_id => 1})
-    put '/testing/2/title', '{"value": "updated"}'
+    put '/testing/2/title', "updated"
     assert_equal 404, last_response.status
   end
 
@@ -229,7 +229,7 @@ class ResourceTest < Test::Unit::TestCase
 
   test "incrementing a value within a document by a custom amount" do
     @collection.save({:counter => 1, :_id => 1})
-    post '/testing/1/counter/_increment', '{"value" : 10}'
+    post '/testing/1/counter/_increment', '10'
     assert last_response.ok?
     assert_equal 11, @collection.find_one(:_id => 1)["counter"]
   end
@@ -248,49 +248,53 @@ class ResourceTest < Test::Unit::TestCase
 
   test "push a simple value onto an array within a document" do
     @collection.save({:list => [1,2,3], :_id => 1})
-    post '/testing/1/list/_push', '{"value" : 4}'
+    post '/testing/1/list/_push', '4'
     assert last_response.ok?
     assert_equal [1,2,3,4], @collection.find_one(:_id => 1)['list']
   end
 
   test "push an object onto an array within a document" do
     @collection.save({:list => [1,2,3], :_id => 1})
-    post '/testing/1/list/_push', '{"value" : { "foo": "bar" }}'
+    header 'Content-Type', 'application/json'
+    post '/testing/1/list/_push', '{"foo": "bar"}'
     assert last_response.ok?
     assert_equal [1,2,3,{"foo" => "bar"}], @collection.find_one(:_id => 1)['list']
   end
 
   test "push more than one item onto an array within a document" do
     @collection.save({:list => [1,2,3], :_id => 1})
-    post '/testing/1/list/_push_all', '{"value" : [4,5,6,7]}'
+    header 'Content-Type', 'application/json'
+    post '/testing/1/list/_push_all', '[4,5,6,7]'
     assert last_response.ok?
     assert_equal [1,2,3,4,5,6,7], @collection.find_one(:_id => 1)['list']
   end
 
   test "pull a simple value from an array within a document" do
     @collection.save({:list => [1,2,3], :_id => 1})
-    post '/testing/1/list/_pull', '{"value" : 2}'
+    post '/testing/1/list/_pull', '2'
     assert last_response.ok?
     assert_equal [1,3], @collection.find_one(:_id => 1)['list']
   end
 
   test "pull an object from an array within a document" do
     @collection.save({:list => [1,2,3,{"foo" => "bar"}], :_id => 1})
-    post '/testing/1/list/_pull', '{"value" : { "foo": "bar" }}'
+    header 'Content-Type', 'application/json'
+    post '/testing/1/list/_pull', '{ "foo": "bar" }'
     assert last_response.ok?
     assert_equal [1,2,3], @collection.find_one(:_id => 1)['list']
   end
 
   test "pull more than one item from an array within a document" do
     @collection.save({:list => [1,2,3,4,5,6,7], :_id => 1})
-    post '/testing/1/list/_pull_all', '{"value" : [4,5,6,7]}'
+    header 'Content-Type', 'application/json'
+    post '/testing/1/list/_pull_all', '[4,5,6,7]'
     assert last_response.ok?
     assert_equal [1,2,3], @collection.find_one(:_id => 1)['list']
   end
 
   test "adding an item to a set" do
     @collection.save({:list => [1,2,3], :_id => 1})
-    post '/testing/1/list/_add_to_set', '{"value" : 4}'
+    post '/testing/1/list/_add_to_set', '4'
     assert last_response.ok?
     assert_equal [1,2,3,4], @collection.find_one(:_id => 1)['list']
   end

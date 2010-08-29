@@ -104,7 +104,7 @@ module Rack::JSON
     end
 
     def modify(request)
-      @collection.send(request.modifier[1..-1], request.query.selector, request.fields, request.modifier_value)
+      @collection.send(request.modifier[1..-1], request.query.selector, request.fields, request.payload)
       render "OK", :status => 200
     end
 
@@ -119,7 +119,7 @@ module Rack::JSON
     end
 
     def update_field(request)
-      @collection.update_field(request.query.selector, request.fields, request.modifier_value)
+      @collection.update_field(request.query.selector, request.fields, request.payload)
       render "OK", :status => 200
     end
 
