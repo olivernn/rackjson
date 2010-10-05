@@ -17,8 +17,8 @@ module Rack::JSON
     end
 
     def set_attribute_ids
-      attributes["_id"] = BSON::ObjectID.from_string(attributes["_id"].to_s)
-    rescue BSON::InvalidObjectID
+      attributes["_id"] = BSON::ObjectId.from_string(attributes["_id"].to_s)
+    rescue BSON::InvalidObjectId
       return false
     end
 

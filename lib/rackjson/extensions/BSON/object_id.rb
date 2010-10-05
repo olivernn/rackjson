@@ -1,5 +1,5 @@
 module BSON
-  class ObjectID
+  class ObjectId
     def to_json
       to_s
     end

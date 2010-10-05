@@ -21,7 +21,7 @@ module Rack::JSON
   autoload :Request, 'rackjson/request'
   autoload :Resource, 'rackjson/resource'
   autoload :Response, 'rackjson/response'
-  autoload :ObjectID, 'rackjson/extensions/bson/object_id'
+  autoload :ObjectId, 'rackjson/extensions/bson/object_id'
   autoload :OrderedHash, 'rackjson/extensions/bson/ordered_hash'
 
 end

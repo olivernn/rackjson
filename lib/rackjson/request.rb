@@ -96,8 +96,8 @@ module Rack::JSON
       unless collection_path?
         id_string = self.path_info.split('/')[2].to_s
         begin
-          BSON::ObjectID.from_string(id_string)
-        rescue BSON::InvalidObjectID
+          BSON::ObjectId.from_string(id_string)
+        rescue BSON::InvalidObjectId
           id_string.match(/^\d+$/) ? id_string.to_i : id_string
         end
       end
