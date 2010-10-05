@@ -31,7 +31,7 @@ module Rack::JSON
     end
 
     def find_one(selector, options={})
-      find(prepared(selector), options).first
+      find(prepared(selector), options.merge(:limit => 0)).first
     end
 
     def decrement(selector, field, value=1)
