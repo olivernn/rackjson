@@ -10,7 +10,7 @@ begin
     gem.email = "oliver.n@new-bamboo.co.uk"
     gem.homepage = "http://github.com/olivernn/rackjson"
     gem.authors = ["Oliver Nightingale"]
-    gem.add_dependency('mongo', '>=1.0.0')
+    gem.add_dependency('mongo', '>=1.1.0')
     gem.add_dependency('mongo_ext', '>=0.19.1')
     gem.add_dependency('json', '=1.2.3')
     gem.add_dependency('rack', '>=1.0.1')
