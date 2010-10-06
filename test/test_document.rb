@@ -29,7 +29,7 @@ class DocumentTest < Test::Unit::TestCase
   def test_creating_from_json_with_id
     json = '{"_id": "4b9f783ba040140525000001", "test":"hello"}'
     document = Rack::JSON::Document.create(json)
-    assert_equal(BSON::ObjectID.from_string('4b9f783ba040140525000001'), document.attributes["_id"])
+    assert_equal(BSON::ObjectId.from_string('4b9f783ba040140525000001'), document.attributes["_id"])
     assert_equal("hello", document.attributes["test"])
     assert_equal(Time.now.to_s, document.attributes["created_at"].to_s)
     assert_equal(Time.now.to_s, document.attributes["updated_at"].to_s)
@@ -81,5 +81,12 @@ class DocumentTest < Test::Unit::TestCase
     assert_equal("hello", document.attributes["test"])
     assert_equal("01/01/2010", document.attributes["created_at"])
     assert_equal(Time.now.to_s, document.attributes["updated_at"].to_s)
+  end
+
+  test "accessing getting a single attribute from a document" do
+    json = '{"test":"hello", "nested":{"foo":"bar"}}'
+    document = Rack::JSON::Document.create(json)
+    assert_equal "hello", document.field(["test"])
+    assert_equal "bar", document.field(["nested", "foo"])
   end
 end

@@ -94,6 +94,55 @@ class ResourceTest < Test::Unit::TestCase
     assert_equal "document not found", last_response.body
   end
 
+  test "finding a field within a specific document" do
+    @collection.save({:testing => true, :rating => 5, :title => 'testing', :_id => 1})
+    get '/testing/1/title'
+    assert last_response.ok?
+    assert_equal "testing", last_response.body
+  end
+
+  test "trying to find a field within a non-existant document" do
+    get '/testing/1/title'
+    assert_equal 404, last_response.status
+  end
+
+  test "finding an array inside a document" do
+    @collection.save({:obj => { :hello => "world"}, :ratings => [5,2], :title => 'testing', :_id => 1})
+    get '/testing/1/ratings'
+    assert last_response.ok?
+    expected = [5,2]
+    assert_equal expected, JSON.parse(last_response.body)
+  end
+
+  test "finding an element of an array from a specific document" do
+    @collection.save({:testing => true, :ratings => [5,2], :title => 'testing', :_id => 1})
+    get '/testing/1/ratings/0'
+    assert last_response.ok?
+    assert_equal "5", last_response.body
+  end
+
+  test "finding an embedded document" do
+    @collection.save({:obj => { :hello => "world"}, :ratings => [5,2], :title => 'testing', :_id => 1})
+    get '/testing/1/obj'
+    assert last_response.ok?
+    expected = { "hello" => "world" }
+    assert_equal expected, JSON.parse(last_response.body)
+  end
+
+  test "finding a property of an embedded document" do
+    @collection.save({:obj => { :hello => "world"}, :ratings => [5,2], :title => 'testing', :_id => 1})
+    get '/testing/1/obj/hello'
+    assert last_response.ok?
+    assert_equal "world", last_response.body
+  end
+
+  test "incrementing a property of an embedded document" do
+    @collection.save({:obj => { :counter => 1}, :_id => 1})
+    post '/testing/1/obj/counter/_increment'
+    assert last_response.ok?
+    assert_equal 2, @collection.find_one(:_id => 1)["obj"]["counter"]
+  end
+
   test "index method with query parameters" do
     @collection.save({:testing => true, :rating => 5, :title => 'testing'})
     get '/testing?[?title=testing]'
@@ -144,12 +193,126 @@ class ResourceTest < Test::Unit::TestCase
     assert_nil @collection.find_one(:_id => 1, :user_id => 1)
   end
 
+  test "updating a field within a document" do
+    @collection.save({:title => 'testing', :_id => 1})
+    put '/testing/1/title', "updated"
+    assert last_response.ok?
+    assert_equal "updated", @collection.find_one(:_id => 1)['title']
+  end
+
+  test "creating a new field within an existing documennt" do
+    @collection.save({:title => 'testing', :_id => 1})
+    put '/testing/1/new_field', "created"
+    assert last_response.ok?
+    assert_equal "created", @collection.find_one(:_id => 1)['new_field']
+  end
+
+  test "trying to create a new field within a non-existant document" do
+    @collection.save({:title => 'testing', :_id => 1})
+    put '/testing/2/title', "updated"
+    assert_equal 404, last_response.status
+  end
+
+  test "incrementing a value within a document" do
+    @collection.save({:counter => 1, :_id => 1})
+    post '/testing/1/counter/_increment'
+    assert last_response.ok?
+    assert_equal 2, @collection.find_one(:_id => 1)["counter"]
+  end
+
+  test "incrementing a non existant field" do
+    @collection.save({:_id => 1})
+    post '/testing/1/counter/_increment'
+    assert last_response.ok?
+    assert_equal 1, @collection.find_one(:_id => 1)["counter"]
+  end
+
+  test "incrementing a value within a document by a custom amount" do
+    @collection.save({:counter => 1, :_id => 1})
+    post '/testing/1/counter/_increment', '10'
+    assert last_response.ok?
+    assert_equal 11, @collection.find_one(:_id => 1)["counter"]
+  end
+
+  test "incrementing a value on a non existent document" do
+    post '/testing/1/counter/_increment'
+    assert_equal 404, last_response.status
+  end
+
+  test "decrementing a value within a document" do
+    @collection.save({:counter => 1, :_id => 1})
+    post '/testing/1/counter/_decrement'
+    assert last_response.ok?
+    assert_equal 0, @collection.find_one(:_id => 1)["counter"]
+  end
+
+  test "push a simple value onto an array within a document" do
+    @collection.save({:list => [1,2,3], :_id => 1})
+    post '/testing/1/list/_push', '4'
+    assert last_response.ok?
+    assert_equal [1,2,3,4], @collection.find_one(:_id => 1)['list']
+  end
+
+  test "push an object onto an array within a document" do
+    @collection.save({:list => [1,2,3], :_id => 1})
+    header 'Content-Type', 'application/json'
+    post '/testing/1/list/_push', '{"foo": "bar"}'
+    assert last_response.ok?
+    assert_equal [1,2,3,{"foo" => "bar"}], @collection.find_one(:_id => 1)['list']
+  end
+
+  test "push more than one item onto an array within a document" do
+    @collection.save({:list => [1,2,3], :_id => 1})
+    header 'Content-Type', 'application/json'
+    post '/testing/1/list/_push_all', '[4,5,6,7]'
+    assert last_response.ok?
+    assert_equal [1,2,3,4,5,6,7], @collection.find_one(:_id => 1)['list']
+  end
+
+  test "pull a simple value from an array within a document" do
+    @collection.save({:list => [1,2,3], :_id => 1})
+    post '/testing/1/list/_pull', '2'
+    assert last_response.ok?
+    assert_equal [1,3], @collection.find_one(:_id => 1)['list']
+  end
+
+  test "pull an object from an array within a document" do
+    @collection.save({:list => [1,2,3,{"foo" => "bar"}], :_id => 1})
+    header 'Content-Type', 'application/json'
+    post '/testing/1/list/_pull', '{ "foo": "bar" }'
+    assert last_response.ok?
+    assert_equal [1,2,3], @collection.find_one(:_id => 1)['list']
+  end
+
+  test "pull more than one item from an array within a document" do
+    @collection.save({:list => [1,2,3,4,5,6,7], :_id => 1})
+    header 'Content-Type', 'application/json'
+    post '/testing/1/list/_pull_all', '[4,5,6,7]'
+    assert last_response.ok?
+    assert_equal [1,2,3], @collection.find_one(:_id => 1)['list']
+  end
+
+  test "adding an item to a set" do
+    @collection.save({:list => [1,2,3], :_id => 1})
+    post '/testing/1/list/_add_to_set', '4'
+    assert last_response.ok?
+    assert_equal [1,2,3,4], @collection.find_one(:_id => 1)['list']
+  end
+
   test "deleting a document" do
     @collection.save({:title => 'testing', :_id => 1})
     assert @collection.find_one({:_id => 1})
     delete '/testing/1'
-    assert last_response.ok?
+    assert_equal 204, last_response.status
     assert_nil @collection.find_one({:_id => 1})
+  end
+
+  test "deleting a field within a document" do
+    @collection.save({:title => 'testing', :_id => 1})
+    assert @collection.find_one({:_id => 1})
+    delete '/testing/1/title'
+    assert_equal 204, last_response.status
+    assert_nil @collection.find_one({:_id => 1})['title']
   end
 
   test "deleting only with member path" do

@@ -1,9 +1,10 @@
 module Rack::JSON
   class JSONQuery
 
-    attr_accessor :options, :selector
+    attr_accessor :options, :selector, :resource_id
 
-    def initialize(query_string)
+    def initialize(query_string, options={})
+      @resource_id = options[:resource_id] || nil
       @query_string = query_string
       @conditions = @query_string.split(/\[|\]/).compact.reject {|s| s.empty? }
       @options = {}
@@ -21,6 +22,7 @@ module Rack::JSON
           end
         end
       end
+      add_query_document_id
     end
 
     def comparison(symbol)
@@ -30,6 +32,12 @@ module Rack::JSON
         '=<' => '$lte',
         '>=' => '$gte'
       }[symbol]
+    end
+
+    def add_query_document_id
+      if resource_id
+        @selector[:_id] = resource_id
+      end
     end
 
     def set_query_fields(condition)
