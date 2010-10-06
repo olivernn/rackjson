@@ -77,18 +77,15 @@ Gem::Specification.new do |s|
 
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<mongo>, [">= 1.1"])
-      s.add_runtime_dependency(%q<mongo_ext>, [">= 0.19.1"])
       s.add_runtime_dependency(%q<json>, ["= 1.2.3"])
       s.add_runtime_dependency(%q<rack>, [">= 1.0.1"])
     else
       s.add_dependency(%q<mongo>, [">= 1.1"])
-      s.add_dependency(%q<mongo_ext>, [">= 0.19.1"])
       s.add_dependency(%q<json>, ["= 1.2.3"])
       s.add_dependency(%q<rack>, [">= 1.0.1"])
     end
   else
     s.add_dependency(%q<mongo>, [">= 1.1"])
-    s.add_dependency(%q<mongo_ext>, [">= 0.19.1"])
     s.add_dependency(%q<json>, ["= 1.2.3"])
     s.add_dependency(%q<rack>, [">= 1.0.1"])
   end
