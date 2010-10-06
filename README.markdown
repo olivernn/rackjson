@@ -53,6 +53,8 @@ When creating resources with either the public or private resources the specifie
 
 ### REST API
 
+#### Collections
+
 To see what actions are available on the notes resource:
 
     curl -i -XOPTIONS http://localhost:9292/notes
@@ -147,6 +149,98 @@ Finally a resource can be deleted using a DELETE request
     Content-Length: 12
     
     {"ok": "true"}
+
+#### Nested Documents
+
+Rack::JSON fully supports nested documents.  Any element within a document can be accessed directly regardless of how deeply it is nested.  For example if the following document exists at the location `/notes/1`
+
+    {
+      "_id": 1,
+      "title": "Nested Document",
+      "author": {
+        "name": "Bob",
+        "contacts": {
+          "email": "bob@mail.com"
+        }
+      },
+      "viewed_by": [1, 5, 12, 87],
+      "comments": [{
+        "user_id": 1
+        "text": "awesome!"
+      }]
+    }
+
+To get just all the comments we can make a get request to `/notes/1/comments`
+
+    curl -i http://localhost:9292/notes/1/comments
+    
+    HTTP/1.1 200 OK
+    Connection: close
+    Date: Sun, 29 Aug 2010 19:43:09 GMT
+    Content-Type: application/json
+    Content-Length: 33
+    
+    [{"text":"awesome!","user_id":1}]
+
+We can also get just the first comment by passing in the index of that comment in the array, to get the first comment make a GET request to `/notes/1/comments/0`
+
+    curl -i http://localhost:9292/notes/1/comments/0
+    
+    HTTP/1.1 200 OK
+    Connection: close
+    Date: Sun, 29 Aug 2010 19:45:28 GMT
+    Content-Type: application/json
+    Content-Length: 31
+    
+    {"text":"awesome!","user_id":1}
+
+If we try and get a comment that doesn't exist in the array a 404 is returned.
+
+    curl -i http://localhost:9292/notes/1/comments/1
+    
+    HTTP/1.1 404 Not Found
+    Connection: close
+    Date: Sun, 29 Aug 2010 19:46:46 GMT
+    Content-Type: text/plain
+    Content-Length: 15
+    
+    field not found
+
+Any field within the document is accessable in this way, just append the field name or the index of the item within an array to the url.
+
+As well as providing read access to any field within a document Rack::JSON also allows you to modify or remove any field within a document.  To change the value of a field make a PUT request to the fields url and pass the value you want as the body.
+
+Both simple values, numbers and strings, or JSON structures can be set in this way, however if you want to set a field to contain a JSON structure (array or object) you must set the correct content type for the request, application/json.
+
+#### Array Modifiers
+
+Fields within a document that are arrays also support atomic push and pulls for adding and removing items from an array.
+
+To push a new item onto an array we make a post request to _push
+
+    curl -i -XPOST -d'101' http://localhost:9292/notes/1/viewed_by/_push
+
+The above will push the value 101 onto the viewed by array within the note with _id 1.
+
+Similarly an item can be pulled from an array using _pull
+
+    curl -i -XPOST -d'101' http://localhost:9292/notes/1/viewed_by/_pull
+
+This will remove the value 101 from the viewed_by array if it already exists.
+To remove or add more than one item from an array we can use either _pull_all or _push_all passing in an array each time.
+
+Arrays within documents can also be treated like sets and only add items that do not currently exists by using the add_to_set command like below
+
+    curl -i -XPOST -d'101' http://localhost:9292/notes/1/viewed_by/_add_to_set
+
+This will only add the value 101 to the viewed_by array if it doesn't already exist.
+
+#### Incrementing & Decrementing
+
+RackJSON provides a simple means of incrementing and decrementing counters within a document, simply make a post request to either _increment or _decrement as shown below
+
+    curl -i -XPOST http://localhost:9292/notes/1/views/_increment
+    curl -i -XPOST http://localhost:9292/notes/1/views/_decrement
 
 ### JSON Query
 
