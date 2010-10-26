@@ -18,7 +18,7 @@ In your rackup file:
     expose_resource :collections => [:notes], :db => Mongo::Connection.new.db("mydb")
     
     run lambda { |env| 
-      [404, {'Content-Length' => '9', 'Content-Type' => 'text/plain'}, "Not Found"]
+      [404, {'Content-Type' => 'text/plain'}, ["Not Found"]]
     }
 
 This will set up a RESTful resource called 'notes' at /notes which will store any JSON document.
@@ -45,9 +45,9 @@ Using `expose_resource` won't restrict access to the resource at all, all reques
 
 Using `public_resource` will allow everyone to perform GET requests against the resource, however to make POST, PUT or DELETE requests the requester must have a specific session param, and will only be able to make requests to documents which match this session param.  In the above example this session param is set to user_id and could be set when logging in.
 
-`public_resource :collections => [:notes], :filters => [:user_id], :db => Mongo::Connection.new.db("mydb")`
+`private_resource :collections => [:notes], :filters => [:user_id], :db => Mongo::Connection.new.db("mydb")`
 
-Private resource is very similar except that all requests, including GET requests must also satisfy the pre-condition of having a specific session param.
+`private_resource` is very similar except that all requests, including GET requests must also satisfy the pre-condition of having a specific session param.
 
 When creating resources with either the public or private resources the specified session param will be included in the document automatically.
 
