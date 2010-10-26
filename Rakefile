@@ -12,7 +12,7 @@ begin
     gem.authors = ["Oliver Nightingale"]
     gem.add_dependency('mongo', '>=1.1.0')
     gem.add_dependency('mongo_ext', '>=0.19.1')
-    gem.add_dependency('json', '=1.2.3')
+    gem.add_dependency('json', '>=1.2.3')
     gem.add_dependency('rack', '>=1.0.1')
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end
