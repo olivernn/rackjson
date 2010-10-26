@@ -5,13 +5,6 @@ module Rack::JSON
 
     include Rack::Utils
 
-    attr_reader :env
-
-    def initialize(env)
-      @env = env
-      super(env)
-    end
-
     def add_query_param(param)
       self.query_string << param
     end
@@ -101,10 +94,6 @@ module Rack::JSON
           id_string.match(/^\d+$/) ? id_string.to_i : id_string
         end
       end
-    end
-
-    def session
-      @env['rack.session'] || {}
     end
 
     def set_body json
