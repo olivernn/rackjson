@@ -22,7 +22,7 @@ module Rack
       @ins << lambda do |app|
         Rack::JSON::Filter.new(
           Rack::JSON::Resource.new(app, options),
-        options.merge(:methods => [:post, :put, :delete]))
+          options.merge(:methods => [:post, :put, :delete]))
       end
     end
 
@@ -37,7 +37,7 @@ module Rack
       @ins << lambda do |app|
         Rack::JSON::Filter.new(
           Rack::JSON::Resource.new(app, options),
-        options.merge(:methods => [:get, :post, :put, :delete]))
+          options.merge(:methods => [:get, :post, :put, :delete]))
       end
     end
   end

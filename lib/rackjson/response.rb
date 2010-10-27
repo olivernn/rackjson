@@ -10,8 +10,8 @@ module Rack::JSON
       @head = options[:head] || false
       @headers = options[:headers] || {}
       parse_body(body)
-      set_headers
       head_response if @head
+      set_headers
     end
 
     def to_a
