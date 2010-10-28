@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{rackjson}
-  s.version = "0.4.1"
+  s.version = "0.4.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Oliver Nightingale"]
-  s.date = %q{2010-10-26}
+  s.date = %q{2010-10-28}
   s.description = %q{A rack end point for storing json documents.}
   s.email = %q{oliver.n@new-bamboo.co.uk}
   s.extra_rdoc_files = [
@@ -27,6 +27,7 @@ Gem::Specification.new do |s|
      "lib/rackjson/collection.rb",
      "lib/rackjson/document.rb",
      "lib/rackjson/end_point.rb",
+     "lib/rackjson/errors.rb",
      "lib/rackjson/extensions/BSON/object_id.rb",
      "lib/rackjson/extensions/BSON/ordered_hash.rb",
      "lib/rackjson/extensions/core/array.rb",
@@ -62,6 +63,7 @@ Gem::Specification.new do |s|
      "test/suite.rb",
      "test/test_collection.rb",
      "test/test_document.rb",
+     "test/test_embeded_resource.rb",
      "test/test_filter.rb",
      "test/test_json_document.rb",
      "test/test_json_query.rb",
@@ -75,7 +77,7 @@ Gem::Specification.new do |s|
     current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
     s.specification_version = 3
 
-    if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
+    if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<mongo>, [">= 1.1.0"])
       s.add_runtime_dependency(%q<mongo_ext>, [">= 0.19.1"])
       s.add_runtime_dependency(%q<json>, [">= 1.2.3"])
