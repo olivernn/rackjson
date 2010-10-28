@@ -6,6 +6,7 @@ require 'time'
 require 'rackjson/rack/builder'
 require 'rackjson/extensions/core/array'
 require 'rackjson/extensions/core/string'
+require 'rackjson/errors'
 
 module Rack::JSON
 

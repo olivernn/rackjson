@@ -1,8 +1,6 @@
 module Rack::JSON
   class Request < Rack::Request
 
-    class Rack::JSON::Request::UnrecognisedPathTypeError < StandardError ; end
-
     include Rack::Utils
 
     def add_query_param(param)
@@ -49,7 +47,7 @@ module Rack::JSON
       elsif collection_path?
         :collection
       else
-        raise UnrecognisedPathTypeError
+        raise Rack::JSON::UnrecognisedPathTypeError
       end
     end
 

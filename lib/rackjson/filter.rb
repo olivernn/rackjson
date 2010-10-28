@@ -27,7 +27,7 @@ module Rack::JSON
     end
 
     def apply_filters(request)
-      raise 'no filters given!' if @filters.nil?
+      raise Rack::JSON::NoFilterError if @filters.nil?
       @filters.each do |filter|
         return pre_condition_not_met unless request.session.keys.include? filter.to_s
         request.add_query_param "[?#{filter}=#{request.session[filter.to_s]}]"

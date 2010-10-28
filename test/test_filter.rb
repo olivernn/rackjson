@@ -15,6 +15,21 @@ class FilterTest < Test::Unit::TestCase
     )
   end
 
+  def app_without_filter
+    Rack::Session::Cookie.new(
+      Rack::JSON::Filter.new lambda { |env|
+        request = Rack::JSON::Request.new(env)
+        env['rack.session'] = {}
+        env['rack.session']['user_id'] = 1
+        [200, {'Content-Length' => request.json.length.to_s, 'Content-Type' => 'text/plain'}, [request.json]]
+      },  :collections => [:testing], :methods => @test_methods || [:get, :post, :put, :delete]
+    )
+  end
+
+  def use_app_without_filter
+    FilterTest.class_eval { def app; app_without_filter; end }
+  end
+
   test "adding a user id query parameter" do
     get '/login'
     get '/testing'
@@ -76,5 +91,13 @@ class FilterTest < Test::Unit::TestCase
     get '/login'
     post '/testing', 'invalid json'
     assert_equal 422, last_response.status
+  end
+
+  test "should raise an error if no filters are passed" do
+    use_app_without_filter
+
+    assert_raise Rack::JSON::NoFilterError do
+      get '/testing'
+    end
   end
 end

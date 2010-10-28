@@ -3,15 +3,13 @@ module Rack::JSON
 
     attr_accessor :attributes
 
-    class BadDocumentFormatError < ArgumentError ; end
-
     def self.create(doc)
       if doc.is_a? String
         Rack::JSON::JSONDocument.new(doc)
       elsif doc.is_a? BSON::OrderedHash
         Rack::JSON::MongoDocument.new(doc)
       else
-        raise Rack::JSON::Document::BadDocumentFormatError
+        raise Rack::JSON::DocumentFormatError
       end
     end
 

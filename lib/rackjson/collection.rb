@@ -3,8 +3,6 @@ require 'enumerator'
 module Rack::JSON
   class Collection
 
-    class Rack::JSON::Collection::DataTypeError < TypeError ; end
-
     def initialize(collection)
       @collection = collection
     end
